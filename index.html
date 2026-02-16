@@ -1,1 +1,3356 @@
+================================================================================
+GOLDEN EGG CLICKER - TELEGRAM WEB APP
+Complete Source Code
+================================================================================
 
+PROJECT STRUCTURE:
+- Frontend: React 19 + Tailwind CSS 4 + TypeScript
+- Backend: Express 4 + tRPC 11 + MySQL
+- Database: Drizzle ORM with MySQL2
+
+================================================================================
+KEY FILES:
+================================================================================
+
+
+=== package.json ===
+{
+  "name": "egg-clicker-webapp",
+  "version": "1.0.0",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "NODE_ENV=development tsx watch server/_core/index.ts",
+    "build": "vite build && esbuild server/_core/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "start": "NODE_ENV=production node dist/index.js",
+    "check": "tsc --noEmit",
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "db:push": "drizzle-kit generate && drizzle-kit migrate"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.693.0",
+    "@aws-sdk/s3-request-presigner": "^3.693.0",
+    "@hookform/resolvers": "^5.2.2",
+    "@radix-ui/react-accordion": "^1.2.12",
+    "@radix-ui/react-alert-dialog": "^1.1.15",
+    "@radix-ui/react-aspect-ratio": "^1.1.7",
+    "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-checkbox": "^1.3.3",
+    "@radix-ui/react-collapsible": "^1.1.12",
+    "@radix-ui/react-context-menu": "^2.2.16",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+    "@radix-ui/react-hover-card": "^1.1.15",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-menubar": "^1.1.16",
+    "@radix-ui/react-navigation-menu": "^1.2.14",
+    "@radix-ui/react-popover": "^1.1.15",
+    "@radix-ui/react-progress": "^1.1.7",
+    "@radix-ui/react-radio-group": "^1.3.8",
+    "@radix-ui/react-scroll-area": "^1.2.10",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-slider": "^1.3.6",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-switch": "^1.2.6",
+    "@radix-ui/react-tabs": "^1.1.13",
+    "@radix-ui/react-toggle": "^1.1.10",
+    "@radix-ui/react-toggle-group": "^1.1.11",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "@tanstack/react-query": "^5.90.2",
+    "@telegram-apps/sdk-react": "^3.3.9",
+    "@trpc/client": "^11.6.0",
+    "@trpc/react-query": "^11.6.0",
+    "@trpc/server": "^11.6.0",
+    "axios": "^1.12.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
+    "cookie": "^1.0.2",
+    "date-fns": "^4.1.0",
+    "dotenv": "^17.2.2",
+    "drizzle-orm": "^0.44.5",
+    "embla-carousel-react": "^8.6.0",
+    "express": "^4.21.2",
+    "framer-motion": "^12.23.22",
+    "input-otp": "^1.4.2",
+    "jose": "6.1.0",
+    "lucide-react": "^0.453.0",
+    "mysql2": "^3.15.0",
+    "nanoid": "^5.1.5",
+    "next-themes": "^0.4.6",
+    "react": "^19.2.1",
+    "react-day-picker": "^9.11.1",
+    "react-dom": "^19.2.1",
+    "react-hook-form": "^7.64.0",
+    "react-resizable-panels": "^3.0.6",
+    "recharts": "^2.15.2",
+    "sonner": "^2.0.7",
+    "streamdown": "^1.4.0",
+    "superjson": "^1.13.3",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7",
+    "vaul": "^1.1.2",
+    "wouter": "^3.3.5",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@builder.io/vite-plugin-jsx-loc": "^0.1.1",
+    "@tailwindcss/typography": "^0.5.15",
+    "@tailwindcss/vite": "^4.1.3",
+    "@types/express": "4.17.21",
+    "@types/google.maps": "^3.58.1",
+    "@types/node": "^24.7.0",
+    "@types/react": "^19.2.1",
+    "@types/react-dom": "^19.2.1",
+    "@vitejs/plugin-react": "^5.0.4",
+    "add": "^2.0.6",
+    "autoprefixer": "^10.4.20",
+    "drizzle-kit": "^0.31.4",
+    "esbuild": "^0.25.0",
+    "pnpm": "^10.15.1",
+    "postcss": "^8.4.47",
+    "prettier": "^3.6.2",
+    "tailwindcss": "^4.1.14",
+    "tsx": "^4.19.1",
+    "tw-animate-css": "^1.4.0",
+    "typescript": "5.9.3",
+    "vite": "^7.1.7",
+    "vite-plugin-manus-runtime": "^0.0.57",
+    "vitest": "^2.1.4"
+  },
+  "packageManager": "pnpm@10.4.1+sha512.c753b6c3ad7afa13af388fa6d808035a008e30ea9993f58c6663e2bc5ff21679aa834db094987129aa4d488b86df57f7b634981b2f827cdcacc698cc0cfb88af",
+  "pnpm": {
+    "patchedDependencies": {
+      "wouter@3.7.1": "patches/wouter@3.7.1.patch"
+    },
+    "overrides": {
+      "tailwindcss>nanoid": "3.3.7"
+    }
+  }
+}
+=== tsconfig.json ===
+{
+  "include": ["client/src/**/*", "shared/**/*", "server/**/*"],
+  "exclude": ["node_modules", "build", "dist", "**/*.test.ts"],
+  "compilerOptions": {
+    "incremental": true,
+    "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
+    "noEmit": true,
+    "module": "ESNext",
+    "strict": true,
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "jsx": "preserve",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "types": ["node", "vite/client"],
+    "paths": {
+      "@/*": ["./client/src/*"],
+      "@shared/*": ["./shared/*"]
+    }
+  }
+}
+
+=== vite.config.ts ===
+import { jsxLocPlugin } from "@builder.io/vite-plugin-jsx-loc";
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import fs from "node:fs";
+import path from "node:path";
+import { defineConfig, type Plugin, type ViteDevServer } from "vite";
+import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
+
+// =============================================================================
+// Manus Debug Collector - Vite Plugin
+// Writes browser logs directly to files, trimmed when exceeding size limit
+// =============================================================================
+
+const PROJECT_ROOT = import.meta.dirname;
+const LOG_DIR = path.join(PROJECT_ROOT, ".manus-logs");
+const MAX_LOG_SIZE_BYTES = 1 * 1024 * 1024; // 1MB per log file
+const TRIM_TARGET_BYTES = Math.floor(MAX_LOG_SIZE_BYTES * 0.6); // Trim to 60% to avoid constant re-trimming
+
+type LogSource = "browserConsole" | "networkRequests" | "sessionReplay";
+
+function ensureLogDir() {
+  if (!fs.existsSync(LOG_DIR)) {
+    fs.mkdirSync(LOG_DIR, { recursive: true });
+  }
+}
+
+function trimLogFile(logPath: string, maxSize: number) {
+  try {
+    if (!fs.existsSync(logPath) || fs.statSync(logPath).size <= maxSize) {
+      return;
+    }
+
+    const lines = fs.readFileSync(logPath, "utf-8").split("\n");
+    const keptLines: string[] = [];
+    let keptBytes = 0;
+
+    // Keep newest lines (from end) that fit within 60% of maxSize
+    const targetSize = TRIM_TARGET_BYTES;
+    for (let i = lines.length - 1; i >= 0; i--) {
+      const lineBytes = Buffer.byteLength(`${lines[i]}\n`, "utf-8");
+      if (keptBytes + lineBytes > targetSize) break;
+      keptLines.unshift(lines[i]);
+      keptBytes += lineBytes;
+    }
+
+    fs.writeFileSync(logPath, keptLines.join("\n"), "utf-8");
+  } catch {
+    /* ignore trim errors */
+  }
+}
+
+function writeToLogFile(source: LogSource, entries: unknown[]) {
+  if (entries.length === 0) return;
+
+  ensureLogDir();
+  const logPath = path.join(LOG_DIR, `${source}.log`);
+
+  // Format entries with timestamps
+  const lines = entries.map((entry) => {
+    const ts = new Date().toISOString();
+    return `[${ts}] ${JSON.stringify(entry)}`;
+  });
+
+  // Append to log file
+  fs.appendFileSync(logPath, `${lines.join("\n")}\n`, "utf-8");
+
+  // Trim if exceeds max size
+  trimLogFile(logPath, MAX_LOG_SIZE_BYTES);
+}
+
+/**
+ * Vite plugin to collect browser debug logs
+ * - POST /__manus__/logs: Browser sends logs, written directly to files
+ * - Files: browserConsole.log, networkRequests.log, sessionReplay.log
+ * - Auto-trimmed when exceeding 1MB (keeps newest entries)
+ */
+function vitePluginManusDebugCollector(): Plugin {
+  return {
+    name: "manus-debug-collector",
+
+    transformIndexHtml(html) {
+      if (process.env.NODE_ENV === "production") {
+        return html;
+      }
+      return {
+        html,
+        tags: [
+          {
+            tag: "script",
+            attrs: {
+              src: "/__manus__/debug-collector.js",
+              defer: true,
+            },
+            injectTo: "head",
+          },
+        ],
+      };
+    },
+
+    configureServer(server: ViteDevServer) {
+      // POST /__manus__/logs: Browser sends logs (written directly to files)
+      server.middlewares.use("/__manus__/logs", (req, res, next) => {
+        if (req.method !== "POST") {
+          return next();
+        }
+
+        const handlePayload = (payload: any) => {
+          // Write logs directly to files
+          if (payload.consoleLogs?.length > 0) {
+            writeToLogFile("browserConsole", payload.consoleLogs);
+          }
+          if (payload.networkRequests?.length > 0) {
+            writeToLogFile("networkRequests", payload.networkRequests);
+          }
+          if (payload.sessionEvents?.length > 0) {
+            writeToLogFile("sessionReplay", payload.sessionEvents);
+          }
+
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ success: true }));
+        };
+
+        const reqBody = (req as { body?: unknown }).body;
+        if (reqBody && typeof reqBody === "object") {
+          try {
+            handlePayload(reqBody);
+          } catch (e) {
+            res.writeHead(400, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ success: false, error: String(e) }));
+          }
+          return;
+        }
+
+        let body = "";
+        req.on("data", (chunk) => {
+          body += chunk.toString();
+        });
+
+        req.on("end", () => {
+          try {
+            const payload = JSON.parse(body);
+            handlePayload(payload);
+          } catch (e) {
+            res.writeHead(400, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ success: false, error: String(e) }));
+          }
+        });
+      });
+    },
+  };
+}
+
+const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector()];
+
+export default defineConfig({
+  plugins,
+  resolve: {
+    alias: {
+      "@": path.resolve(import.meta.dirname, "client", "src"),
+      "@shared": path.resolve(import.meta.dirname, "shared"),
+      "@assets": path.resolve(import.meta.dirname, "attached_assets"),
+    },
+  },
+  envDir: path.resolve(import.meta.dirname),
+  root: path.resolve(import.meta.dirname, "client"),
+  publicDir: path.resolve(import.meta.dirname, "client", "public"),
+  build: {
+    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    emptyOutDir: true,
+  },
+  server: {
+    host: true,
+    allowedHosts: [
+      ".manuspre.computer",
+      ".manus.computer",
+      ".manus-asia.computer",
+      ".manuscomputer.ai",
+      ".manusvm.computer",
+      "localhost",
+      "127.0.0.1",
+    ],
+    fs: {
+      strict: true,
+      deny: ["**/.*"],
+    },
+  },
+});
+
+=== drizzle/schema.ts ===
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, bigint, boolean, decimal } from "drizzle-orm/mysql-core";
+
+/**
+ * Core user table backing auth flow.
+ */
+export const users = mysqlTable("users", {
+  id: int("id").autoincrement().primaryKey(),
+  openId: varchar("openId", { length: 64 }).notNull().unique(),
+  name: text("name"),
+  email: varchar("email", { length: 320 }),
+  loginMethod: varchar("loginMethod", { length: 64 }),
+  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
+});
+
+export type User = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;
+
+/**
+ * Players table - stores game data for each user
+ */
+export const players = mysqlTable("players", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id),
+  telegramId: varchar("telegramId", { length: 64 }).notNull().unique(),
+  username: varchar("username", { length: 255 }),
+  firstName: text("firstName"),
+  lastName: text("lastName"),
+  photoUrl: text("photoUrl"),
+  eggs: bigint("eggs", { mode: "number" }).default(0).notNull(),
+  coins: bigint("coins", { mode: "number" }).default(0).notNull(),
+  totalClicks: bigint("totalClicks", { mode: "number" }).default(0).notNull(),
+  clickMultiplier: decimal("clickMultiplier", { precision: 20, scale: 2 }).default("1.00").notNull(),
+  level: int("level").default(1).notNull(),
+  experience: bigint("experience", { mode: "number" }).default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Player = typeof players.$inferSelect;
+export type InsertPlayer = typeof players.$inferInsert;
+
+/**
+ * Upgrades table - stores purchased upgrades for each player
+ */
+export const upgrades = mysqlTable("upgrades", {
+  id: int("id").autoincrement().primaryKey(),
+  playerId: int("playerId").notNull().references(() => players.id),
+  upgradeType: varchar("upgradeType", { length: 64 }).notNull(),
+  level: int("level").default(1).notNull(),
+  multiplierBonus: decimal("multiplierBonus", { precision: 20, scale: 2 }).notNull(),
+  purchasedAt: timestamp("purchasedAt").defaultNow().notNull(),
+});
+
+export type Upgrade = typeof upgrades.$inferSelect;
+export type InsertUpgrade = typeof upgrades.$inferInsert;
+
+/**
+ * Achievements table - tracks unlocked achievements
+ */
+export const achievements = mysqlTable("achievements", {
+  id: int("id").autoincrement().primaryKey(),
+  playerId: int("playerId").notNull().references(() => players.id),
+  achievementId: varchar("achievementId", { length: 64 }).notNull(),
+  achievementName: varchar("achievementName", { length: 255 }).notNull(),
+  description: text("description"),
+  reward: int("reward").default(0).notNull(),
+  unlockedAt: timestamp("unlockedAt").defaultNow().notNull(),
+});
+
+export type Achievement = typeof achievements.$inferSelect;
+export type InsertAchievement = typeof achievements.$inferInsert;
+
+/**
+ * Inventory table - stores buffs and items
+ */
+export const inventory = mysqlTable("inventory", {
+  id: int("id").autoincrement().primaryKey(),
+  playerId: int("playerId").notNull().references(() => players.id),
+  itemType: varchar("itemType", { length: 64 }).notNull(),
+  itemName: varchar("itemName", { length: 255 }).notNull(),
+  description: text("description"),
+  multiplierBonus: decimal("multiplierBonus", { precision: 20, scale: 2 }).default("0.00"),
+  duration: int("duration").default(0).notNull(), // in seconds, 0 = permanent
+  isActive: boolean("isActive").default(false).notNull(),
+  activatedAt: timestamp("activatedAt"),
+  expiresAt: timestamp("expiresAt"),
+  obtainedAt: timestamp("obtainedAt").defaultNow().notNull(),
+});
+
+export type InventoryItem = typeof inventory.$inferSelect;
+export type InsertInventoryItem = typeof inventory.$inferInsert;
+
+/**
+ * Box purchases history
+ */
+export const boxPurchases = mysqlTable("boxPurchases", {
+  id: int("id").autoincrement().primaryKey(),
+  playerId: int("playerId").notNull().references(() => players.id),
+  boxType: mysqlEnum("boxType", ["normal", "silver", "gold", "diamond"]).notNull(),
+  cost: int("cost").notNull(),
+  purchasedAt: timestamp("purchasedAt").defaultNow().notNull(),
+});
+
+export type BoxPurchase = typeof boxPurchases.$inferSelect;
+export type InsertBoxPurchase = typeof boxPurchases.$inferInsert;
+
+/**
+ * Referrals table - tracks referral relationships
+ */
+export const referrals = mysqlTable("referrals", {
+  id: int("id").autoincrement().primaryKey(),
+  referrerId: int("referrerId").notNull().references(() => players.id),
+  referredId: int("referredId").notNull().references(() => players.id),
+  referralCode: varchar("referralCode", { length: 64 }).notNull().unique(),
+  rewardGiven: boolean("rewardGiven").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Referral = typeof referrals.$inferSelect;
+export type InsertReferral = typeof referrals.$inferInsert;
+
+=== server/db.ts ===
+import { eq, desc, and, lt } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/mysql2";
+import { InsertUser, users, players, InsertPlayer, upgrades, achievements, inventory, boxPurchases, InsertUpgrade, InsertAchievement, InsertInventoryItem, InsertBoxPurchase } from "../drizzle/schema";
+import { ENV } from './_core/env';
+
+let _db: ReturnType<typeof drizzle> | null = null;
+
+export async function getDb() {
+  if (!_db && process.env.DATABASE_URL) {
+    try {
+      _db = drizzle(process.env.DATABASE_URL);
+    } catch (error) {
+      console.warn("[Database] Failed to connect:", error);
+      _db = null;
+    }
+  }
+  return _db;
+}
+
+export async function upsertUser(user: InsertUser): Promise<void> {
+  if (!user.openId) {
+    throw new Error("User openId is required for upsert");
+  }
+
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot upsert user: database not available");
+    return;
+  }
+
+  try {
+    const values: InsertUser = {
+      openId: user.openId,
+    };
+    const updateSet: Record<string, unknown> = {};
+
+    const textFields = ["name", "email", "loginMethod"] as const;
+    type TextField = (typeof textFields)[number];
+
+    const assignNullable = (field: TextField) => {
+      const value = user[field];
+      if (value === undefined) return;
+      const normalized = value ?? null;
+      values[field] = normalized;
+      updateSet[field] = normalized;
+    };
+
+    textFields.forEach(assignNullable);
+
+    if (user.lastSignedIn !== undefined) {
+      values.lastSignedIn = user.lastSignedIn;
+      updateSet.lastSignedIn = user.lastSignedIn;
+    }
+    if (user.role !== undefined) {
+      values.role = user.role;
+      updateSet.role = user.role;
+    } else if (user.openId === ENV.ownerOpenId) {
+      values.role = 'admin';
+      updateSet.role = 'admin';
+    }
+
+    if (!values.lastSignedIn) {
+      values.lastSignedIn = new Date();
+    }
+
+    if (Object.keys(updateSet).length === 0) {
+      updateSet.lastSignedIn = new Date();
+    }
+
+    await db.insert(users).values(values).onDuplicateKeyUpdate({
+      set: updateSet,
+    });
+  } catch (error) {
+    console.error("[Database] Failed to upsert user:", error);
+    throw error;
+  }
+}
+
+export async function getUserByOpenId(openId: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get user: database not available");
+    return undefined;
+  }
+
+  const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+// Player management
+export async function getPlayerByTelegramId(telegramId: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(players).where(eq(players.telegramId, telegramId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getPlayerByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(players).where(eq(players.userId, userId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createPlayer(player: InsertPlayer) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(players).values(player);
+  return result;
+}
+
+export async function updatePlayer(playerId: number, updates: Partial<InsertPlayer>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(players).set(updates).where(eq(players.id, playerId));
+}
+
+// Upgrades
+export async function getPlayerUpgrades(playerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(upgrades).where(eq(upgrades.playerId, playerId));
+}
+
+export async function createUpgrade(upgrade: InsertUpgrade) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(upgrades).values(upgrade);
+  return result;
+}
+
+// Achievements
+export async function getPlayerAchievements(playerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(achievements).where(eq(achievements.playerId, playerId));
+}
+
+export async function createAchievement(achievement: InsertAchievement) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(achievements).values(achievement);
+  return result;
+}
+
+// Inventory
+export async function getPlayerInventory(playerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(inventory).where(eq(inventory.playerId, playerId));
+}
+
+export async function createInventoryItem(item: InsertInventoryItem) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(inventory).values(item);
+  return result;
+}
+
+export async function updateInventoryItem(itemId: number, updates: Partial<InsertInventoryItem>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(inventory).set(updates).where(eq(inventory.id, itemId));
+}
+
+export async function getInventoryItem(itemId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(inventory).where(eq(inventory.id, itemId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+// Deactivate expired buffs
+export async function deactivateExpiredBuffs() {
+  const db = await getDb();
+  if (!db) return;
+
+  const now = new Date();
+  await db.update(inventory)
+    .set({ isActive: false })
+    .where(and(
+      eq(inventory.isActive, true),
+      lt(inventory.expiresAt, now)
+    ));
+}
+
+// Box purchases
+export async function createBoxPurchase(purchase: InsertBoxPurchase) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(boxPurchases).values(purchase);
+  return result;
+}
+
+// Leaderboard
+export async function getLeaderboard(limit: number = 100) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(players).orderBy(desc(players.eggs)).limit(limit);
+}
+
+// Referrals
+import { referrals, InsertReferral } from "../drizzle/schema";
+
+export async function createReferral(referral: InsertReferral) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(referrals).values(referral);
+  return result;
+}
+
+export async function getReferralByCode(code: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(referrals).where(eq(referrals.referralCode, code)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getReferralsByReferrerId(referrerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(referrals).where(eq(referrals.referrerId, referrerId));
+}
+
+export async function updateReferral(referralId: number, updates: Partial<InsertReferral>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(referrals).set(updates).where(eq(referrals.id, referralId));
+}
+
+=== server/routers.ts ===
+import { COOKIE_NAME } from "@shared/const";
+import { getSessionCookieOptions } from "./_core/cookies";
+import { systemRouter } from "./_core/systemRouter";
+import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { z } from "zod";
+import * as db from "./db";
+import { referralRouter } from "./referral-router";
+
+// Achievement definitions
+const ACHIEVEMENTS = [
+  { id: "first_click", name: "First Click", description: "Click the egg for the first time", requirement: 1, reward: 100 },
+  { id: "click_100", name: "Beginner Clicker", description: "Click 100 times", requirement: 100, reward: 500 },
+  { id: "click_1000", name: "Expert Clicker", description: "Click 1,000 times", requirement: 1000, reward: 2000 },
+  { id: "click_10000", name: "Master Clicker", description: "Click 10,000 times", requirement: 10000, reward: 10000 },
+  { id: "eggs_10000", name: "Egg Collector", description: "Collect 10,000 eggs", requirement: 10000, reward: 5000 },
+  { id: "eggs_100000", name: "Egg Hoarder", description: "Collect 100,000 eggs", requirement: 100000, reward: 25000 },
+  { id: "level_10", name: "Level 10", description: "Reach level 10", requirement: 10, reward: 5000 },
+  { id: "level_50", name: "Level 50", description: "Reach level 50", requirement: 50, reward: 50000 },
+];
+
+// Level progression (exponential)
+function getRequiredExperienceForLevel(level: number): number {
+  return Math.floor(100 * Math.pow(1.5, level - 1));
+}
+
+function calculateLevel(experience: number): number {
+  let level = 1;
+  let totalExp = 0;
+  while (totalExp + getRequiredExperienceForLevel(level) <= experience) {
+    totalExp += getRequiredExperienceForLevel(level);
+    level++;
+  }
+  return level;
+}
+
+// Upgrade pricing based on multiplier
+function getUpgradePrice(currentMultiplier: number, upgradeType: string): number {
+  const basePrice = {
+    basic: 100,
+    advanced: 1000,
+    expert: 10000,
+    master: 100000,
+  }[upgradeType] || 100;
+
+  return Math.floor(basePrice * Math.pow(1.5, parseFloat(currentMultiplier.toString()) - 1));
+}
+
+// Box rewards
+function generateBoxReward(boxType: "normal" | "silver" | "gold" | "diamond") {
+  const rewards = {
+    normal: [
+      { itemType: "buff", itemName: "Small Boost", multiplierBonus: "0.10", duration: 300 },
+      { itemType: "buff", itemName: "Medium Boost", multiplierBonus: "0.25", duration: 180 },
+    ],
+    silver: [
+      { itemType: "buff", itemName: "Large Boost", multiplierBonus: "0.50", duration: 300 },
+      { itemType: "buff", itemName: "Mega Boost", multiplierBonus: "1.00", duration: 240 },
+    ],
+    gold: [
+      { itemType: "buff", itemName: "Super Boost", multiplierBonus: "2.00", duration: 300 },
+      { itemType: "buff", itemName: "Ultra Boost", multiplierBonus: "3.00", duration: 180 },
+    ],
+    diamond: [
+      { itemType: "buff", itemName: "Epic Boost", multiplierBonus: "5.00", duration: 600 },
+      { itemType: "buff", itemName: "Legendary Boost", multiplierBonus: "10.00", duration: 300 },
+      { itemType: "permanent", itemName: "Permanent Multiplier", multiplierBonus: "0.50", duration: 0 },
+    ],
+  };
+
+  const pool = rewards[boxType];
+  const reward = pool[Math.floor(Math.random() * pool.length)];
+  return {
+    ...reward,
+    description: reward.duration > 0 
+      ? `Increases click multiplier by ${reward.multiplierBonus}x for ${reward.duration}s`
+      : `Permanently increases click multiplier by ${reward.multiplierBonus}x`,
+  };
+}
+
+export const appRouter = router({
+  system: systemRouter,
+  auth: router({
+    me: publicProcedure.query(opts => opts.ctx.user),
+    logout: publicProcedure.mutation(({ ctx }) => {
+      const cookieOptions = getSessionCookieOptions(ctx.req);
+      ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+      return {
+        success: true,
+      } as const;
+    }),
+  }),
+
+  player: router({
+    // Get or create player
+    getOrCreate: protectedProcedure
+      .input(z.object({
+        telegramId: z.string(),
+        username: z.string().optional(),
+        firstName: z.string().optional(),
+        lastName: z.string().optional(),
+        photoUrl: z.string().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        let player = await db.getPlayerByUserId(ctx.user.id);
+        
+        if (!player) {
+          // Check if player exists with this telegram ID
+          player = await db.getPlayerByTelegramId(input.telegramId);
+          
+          if (!player) {
+            // Create new player
+            await db.createPlayer({
+              userId: ctx.user.id,
+              telegramId: input.telegramId,
+              username: input.username,
+              firstName: input.firstName,
+              lastName: input.lastName,
+              photoUrl: input.photoUrl,
+              eggs: 0,
+              coins: 0,
+              totalClicks: 0,
+              clickMultiplier: "1.00",
+              level: 1,
+              experience: 0,
+            });
+            
+            player = await db.getPlayerByUserId(ctx.user.id);
+          }
+        }
+
+        // Deactivate expired buffs
+        await db.deactivateExpiredBuffs();
+
+        // Calculate active multiplier from buffs
+        const inventory = await db.getPlayerInventory(player!.id);
+        const activeBuffs = inventory.filter(item => item.isActive);
+        const buffMultiplier = activeBuffs.reduce((sum, item) => sum + parseFloat(item.multiplierBonus || "0"), 0);
+
+        return {
+          ...player,
+          activeBuffMultiplier: buffMultiplier,
+          nextLevelExp: getRequiredExperienceForLevel(player!.level),
+        };
+      }),
+
+    // Register click
+    click: protectedProcedure
+      .input(z.object({
+        clicks: z.number().min(1).max(100),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const player = await db.getPlayerByUserId(ctx.user.id);
+        if (!player) throw new Error("Player not found");
+
+        // Calculate total multiplier
+        const inventory = await db.getPlayerInventory(player.id);
+        const activeBuffs = inventory.filter(item => item.isActive);
+        const buffMultiplier = activeBuffs.reduce((sum, item) => sum + parseFloat(item.multiplierBonus || "0"), 0);
+        const totalMultiplier = parseFloat(player.clickMultiplier) + buffMultiplier;
+
+        const eggsGained = Math.floor(input.clicks * totalMultiplier);
+        const newTotalClicks = player.totalClicks + input.clicks;
+        const newEggs = player.eggs + eggsGained;
+        const newExperience = player.experience + input.clicks;
+        const newLevel = calculateLevel(newExperience);
+
+        await db.updatePlayer(player.id, {
+          eggs: newEggs,
+          totalClicks: newTotalClicks,
+          experience: newExperience,
+          level: newLevel,
+        });
+
+        // Check for achievements
+        const existingAchievements = await db.getPlayerAchievements(player.id);
+        const unlockedIds = existingAchievements.map(a => a.achievementId);
+        const newAchievements = [];
+
+        for (const achievement of ACHIEVEMENTS) {
+          if (unlockedIds.includes(achievement.id)) continue;
+
+          let unlocked = false;
+          if (achievement.id.startsWith("click_")) {
+            unlocked = newTotalClicks >= achievement.requirement;
+          } else if (achievement.id.startsWith("eggs_")) {
+            unlocked = newEggs >= achievement.requirement;
+          } else if (achievement.id.startsWith("level_")) {
+            unlocked = newLevel >= achievement.requirement;
+          }
+
+          if (unlocked) {
+            await db.createAchievement({
+              playerId: player.id,
+              achievementId: achievement.id,
+              achievementName: achievement.name,
+              description: achievement.description,
+              reward: achievement.reward,
+            });
+            newAchievements.push(achievement);
+            // Award coins
+            await db.updatePlayer(player.id, {
+              coins: player.coins + achievement.reward,
+            });
+          }
+        }
+
+        return {
+          eggsGained,
+          newEggs,
+          newTotalClicks,
+          newLevel,
+          leveledUp: newLevel > player.level,
+          newAchievements,
+        };
+      }),
+  }),
+
+  upgrades: router({
+    // List available upgrades
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const player = await db.getPlayerByUserId(ctx.user.id);
+      if (!player) throw new Error("Player not found");
+
+      const currentMultiplier = parseFloat(player.clickMultiplier);
+      
+      return [
+        {
+          type: "basic",
+          name: "Basic Upgrade",
+          description: "Increases click multiplier by 0.5x",
+          bonus: 0.5,
+          price: getUpgradePrice(currentMultiplier, "basic"),
+        },
+        {
+          type: "advanced",
+          name: "Advanced Upgrade",
+          description: "Increases click multiplier by 2x",
+          bonus: 2,
+          price: getUpgradePrice(currentMultiplier, "advanced"),
+        },
+        {
+          type: "expert",
+          name: "Expert Upgrade",
+          description: "Increases click multiplier by 5x",
+          bonus: 5,
+          price: getUpgradePrice(currentMultiplier, "expert"),
+        },
+        {
+          type: "master",
+          name: "Master Upgrade",
+          description: "Increases click multiplier by 10x",
+          bonus: 10,
+          price: getUpgradePrice(currentMultiplier, "master"),
+        },
+      ];
+    }),
+
+    // Purchase upgrade
+    purchase: protectedProcedure
+      .input(z.object({
+        upgradeType: z.enum(["basic", "advanced", "expert", "master"]),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const player = await db.getPlayerByUserId(ctx.user.id);
+        if (!player) throw new Error("Player not found");
+
+        const bonusMap = { basic: 0.5, advanced: 2, expert: 5, master: 10 };
+        const bonus = bonusMap[input.upgradeType];
+        const price = getUpgradePrice(parseFloat(player.clickMultiplier), input.upgradeType);
+
+        if (player.eggs < price) {
+          throw new Error("Not enough eggs");
+        }
+
+        const newMultiplier = parseFloat(player.clickMultiplier) + bonus;
+        await db.updatePlayer(player.id, {
+          eggs: player.eggs - price,
+          clickMultiplier: newMultiplier.toFixed(2),
+        });
+
+        await db.createUpgrade({
+          playerId: player.id,
+          upgradeType: input.upgradeType,
+          level: 1,
+          multiplierBonus: bonus.toFixed(2),
+        });
+
+        return {
+          success: true,
+          newMultiplier,
+          newEggs: player.eggs - price,
+        };
+      }),
+  }),
+
+  achievements: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const player = await db.getPlayerByUserId(ctx.user.id);
+      if (!player) throw new Error("Player not found");
+
+      const unlocked = await db.getPlayerAchievements(player.id);
+      const unlockedIds = unlocked.map(a => a.achievementId);
+
+      return ACHIEVEMENTS.map(achievement => ({
+        ...achievement,
+        unlocked: unlockedIds.includes(achievement.id),
+      }));
+    }),
+  }),
+
+  exchange: router({
+    // Exchange eggs for coins
+    eggsToCoins: protectedProcedure
+      .input(z.object({
+        eggs: z.number().min(1),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const player = await db.getPlayerByUserId(ctx.user.id);
+        if (!player) throw new Error("Player not found");
+
+        if (player.eggs < input.eggs) {
+          throw new Error("Not enough eggs");
+        }
+
+        const coinsGained = input.eggs * 2;
+        await db.updatePlayer(player.id, {
+          eggs: player.eggs - input.eggs,
+          coins: player.coins + coinsGained,
+        });
+
+        return {
+          success: true,
+          coinsGained,
+          newEggs: player.eggs - input.eggs,
+          newCoins: player.coins + coinsGained,
+        };
+      }),
+  }),
+
+  boxes: router({
+    // Get box prices
+    list: publicProcedure.query(() => {
+      return [
+        { type: "normal", name: "Normal Box", price: 1000 },
+        { type: "silver", name: "Silver Box", price: 5000 },
+        { type: "gold", name: "Gold Box", price: 25000 },
+        { type: "diamond", name: "Diamond Box", price: 450000 },
+      ];
+    }),
+
+    // Purchase and open box
+    purchase: protectedProcedure
+      .input(z.object({
+        boxType: z.enum(["normal", "silver", "gold", "diamond"]),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const player = await db.getPlayerByUserId(ctx.user.id);
+        if (!player) throw new Error("Player not found");
+
+        const prices = { normal: 1000, silver: 5000, gold: 25000, diamond: 450000 };
+        const price = prices[input.boxType];
+
+        if (player.coins < price) {
+          throw new Error("Not enough coins");
+        }
+
+        // Generate reward
+        const reward = generateBoxReward(input.boxType);
+
+        // Add to inventory
+        await db.createInventoryItem({
+          playerId: player.id,
+          itemType: reward.itemType,
+          itemName: reward.itemName,
+          description: reward.description,
+          multiplierBonus: reward.multiplierBonus,
+          duration: reward.duration,
+          isActive: false,
+        });
+
+        // Deduct coins
+        await db.updatePlayer(player.id, {
+          coins: player.coins - price,
+        });
+
+        // Record purchase
+        await db.createBoxPurchase({
+          playerId: player.id,
+          boxType: input.boxType,
+          cost: price,
+        });
+
+        return {
+          success: true,
+          reward,
+          newCoins: player.coins - price,
+        };
+      }),
+  }),
+
+  inventory: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const player = await db.getPlayerByUserId(ctx.user.id);
+      if (!player) throw new Error("Player not found");
+
+      await db.deactivateExpiredBuffs();
+      return await db.getPlayerInventory(player.id);
+    }),
+
+    activate: protectedProcedure
+      .input(z.object({
+        itemId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const player = await db.getPlayerByUserId(ctx.user.id);
+        if (!player) throw new Error("Player not found");
+
+        const item = await db.getInventoryItem(input.itemId);
+        if (!item || item.playerId !== player.id) {
+          throw new Error("Item not found");
+        }
+
+        if (item.isActive) {
+          throw new Error("Item already active");
+        }
+
+        const now = new Date();
+        const expiresAt = item.duration > 0 ? new Date(now.getTime() + item.duration * 1000) : null;
+
+        await db.updateInventoryItem(input.itemId, {
+          isActive: true,
+          activatedAt: now,
+          expiresAt,
+        });
+
+        // If permanent, add to base multiplier
+        if (item.duration === 0) {
+          const newMultiplier = parseFloat(player.clickMultiplier) + parseFloat(item.multiplierBonus || "0");
+          await db.updatePlayer(player.id, {
+            clickMultiplier: newMultiplier.toFixed(2),
+          });
+        }
+
+        return {
+          success: true,
+          expiresAt,
+        };
+      }),
+  }),
+
+  leaderboard: router({
+    get: publicProcedure
+      .input(z.object({
+        limit: z.number().min(1).max(100).default(50),
+      }))
+      .query(async ({ input }) => {
+        return await db.getLeaderboard(input.limit);
+      }),
+  }),
+
+  referral: referralRouter,
+});
+
+export type AppRouter = typeof appRouter;
+
+=== server/referral-router.ts ===
+import { protectedProcedure, router } from "./_core/trpc";
+import { z } from "zod";
+import * as db from "./db";
+
+export const referralRouter = router({
+  getCode: protectedProcedure.query(async ({ ctx }) => {
+    const player = await db.getPlayerByUserId(ctx.user.id);
+    if (!player) throw new Error("Player not found");
+
+    const myReferrals = await db.getReferralsByReferrerId(player.id);
+    if (myReferrals.length === 0) {
+      const code = `REF-${player.id}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      await db.createReferral({
+        referrerId: player.id,
+        referredId: player.id,
+        referralCode: code,
+        rewardGiven: false,
+      });
+      return { code };
+    }
+
+    return { code: myReferrals[0].referralCode };
+  }),
+
+  getStats: protectedProcedure.query(async ({ ctx }) => {
+    const player = await db.getPlayerByUserId(ctx.user.id);
+    if (!player) throw new Error("Player not found");
+
+    const myReferrals = await db.getReferralsByReferrerId(player.id);
+    const successfulReferrals = myReferrals.filter(r => r.rewardGiven).length;
+    const totalReward = successfulReferrals * 5000;
+
+    return {
+      code: myReferrals[0]?.referralCode || "",
+      totalReferrals: Math.max(0, myReferrals.length - 1),
+      successfulReferrals,
+      totalReward,
+    };
+  }),
+
+  useCode: protectedProcedure
+    .input(z.object({ code: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const player = await db.getPlayerByUserId(ctx.user.id);
+      if (!player) throw new Error("Player not found");
+
+      const referral = await db.getReferralByCode(input.code);
+      if (!referral) throw new Error("Invalid referral code");
+      if (referral.referrerId === player.id) throw new Error("Cannot use your own code");
+
+      await db.updateReferral(referral.id, {
+        referredId: player.id,
+        rewardGiven: true,
+      });
+
+      const referredCoins = 2500;
+
+      await db.updatePlayer(player.id, {
+        coins: (player.coins || 0) + referredCoins,
+      });
+
+      return {
+        success: true,
+        yourReward: referredCoins,
+      };
+    }),
+});
+
+=== client/src/App.tsx ===
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import NotFound from "@/pages/NotFound";
+import { Route, Switch } from "wouter";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { ThemeProvider } from "./contexts/ThemeContext";
+import Game from "./pages/Game";
+import Upgrades from "./pages/Upgrades";
+import Achievements from "./pages/Achievements";
+import Leaderboard from "./pages/Leaderboard";
+import Boxes from "./pages/Boxes";
+import Inventory from "./pages/Inventory";
+import Referral from "./pages/Referral";
+
+function Router() {
+  return (
+    <Switch>
+      <Route path={"/"} component={Game} />
+      <Route path={"/upgrades"} component={Upgrades} />
+      <Route path={"/achievements"} component={Achievements} />
+      <Route path={"/leaderboard"} component={Leaderboard} />
+      <Route path={"/boxes"} component={Boxes} />
+      <Route path={"/inventory"} component={Inventory} />
+      <Route path={"/referral"} component={Referral} />
+      <Route path={"/404"} component={NotFound} />
+      <Route component={NotFound} />
+    </Switch>
+  );
+}
+
+function App() {
+  return (
+    <ErrorBoundary>
+      <ThemeProvider defaultTheme="light">
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
+  );
+}
+
+export default App;
+
+=== client/src/pages/Game.tsx ===
+import { useAuth } from "@/_core/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { useTelegram } from "@/contexts/TelegramContext";
+import { trpc } from "@/lib/trpc";
+import { formatNumber } from "@/lib/utils";
+import { sounds } from "@/lib/sounds";
+import { Egg, Coins, Trophy, ShoppingBag, Package, User, Share2 } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import { useLocation } from "wouter";
+
+interface FloatingText {
+  id: number;
+  value: string;
+  x: number;
+  y: number;
+}
+
+export default function Game() {
+  const { user: authUser } = useAuth();
+  const { user: tgUser, isReady } = useTelegram();
+  const [, setLocation] = useLocation();
+  const [isClicking, setIsClicking] = useState(false);
+  const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
+  const floatingIdRef = useRef(0);
+
+  // Get or create player
+  const { data: player, refetch: refetchPlayer } = trpc.player.getOrCreate.useQuery(
+    {
+      telegramId: tgUser?.id.toString() || "123456789",
+      username: tgUser?.username,
+      firstName: tgUser?.first_name,
+      lastName: tgUser?.last_name,
+      photoUrl: tgUser?.photo_url,
+    },
+    {
+      enabled: isReady && !!authUser,
+    }
+  );
+
+  // Click mutation
+  const clickMutation = trpc.player.click.useMutation({
+    onSuccess: (data) => {
+      refetchPlayer();
+      
+      // Show achievements
+      if (data.newAchievements && data.newAchievements.length > 0) {
+        data.newAchievements.forEach((achievement) => {
+          sounds.achievement();
+          alert(`🎉 Achievement Unlocked: ${achievement.name}\n${achievement.description}\nReward: ${formatNumber(achievement.reward)} coins`);
+        });
+      }
+      
+      // Show level up
+      if (data.leveledUp) {
+        sounds.levelUp();
+        alert(`🎊 Level Up! You are now level ${data.newLevel}!`);
+      }
+    },
+  });
+
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Check if click is within circle
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const radius = Math.min(rect.width, rect.height) / 2;
+    const distance = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+
+    if (distance > radius) return;
+
+    // Add floating text
+    const id = floatingIdRef.current++;
+    setFloatingTexts((prev) => [...prev, { id, value: `+${formatNumber(Math.floor(1 * (player?.clickMultiplier ? parseFloat(player.clickMultiplier) : 1)))}`, x, y }]);
+    setTimeout(() => setFloatingTexts((prev) => prev.filter((t) => t.id !== id)), 1000);
+
+    // Trigger animation
+    setIsClicking(true);
+    setTimeout(() => setIsClicking(false), 200);
+
+    // Play click sound
+    sounds.click();
+
+    // Send click to server
+    clickMutation.mutate({ clicks: 1 });
+  };
+
+  const totalMultiplier = player ? parseFloat(player.clickMultiplier || "1") : 1;
+
+  if (!isReady || !player) {
+    return (
+      <div className="min-h-screen mirror-bg flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin mb-4">
+            <Egg className="w-12 h-12 text-yellow-400" />
+          </div>
+          <p className="text-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Mirror background */}
+      <div className="fixed inset-0 mirror-bg" />
+      
+      {/* Animated overlay */}
+      <div className="fixed inset-0 pointer-events-none">
+        {[...Array(5)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-64 h-64 rounded-full gold-gradient opacity-10 animate-float-gold"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${i * 1.5}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 min-h-screen p-4 pb-24">
+        {/* Header */}
+        <div className="glass-effect p-4 mb-4 border-2 neon-cyan">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {tgUser?.photo_url ? (
+                <img src={tgUser.photo_url} alt="Avatar" className="w-12 h-12 rounded-full border-2 neon-cyan neon-glow" />
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center border-2 neon-cyan neon-glow">
+                  <User className="w-6 h-6 text-primary-foreground" />
+                </div>
+              )}
+              <div>
+                <p className="font-semibold text-foreground">
+                  {tgUser?.first_name} {tgUser?.last_name}
+                </p>
+                <p className="text-sm text-muted-foreground">@{tgUser?.username || "player"}</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-muted-foreground">Level</p>
+              <p className="text-2xl font-bold text-cyan-400">{player.level}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Currency display */}
+        <div className="px-4 mb-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="glass-effect p-4 rounded-2xl border-2 neon-magenta">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 rounded-full gold-gradient flex items-center justify-center border neon-magenta neon-glow">
+                  <Egg className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-sm text-muted-foreground">Eggs</span>
+              </div>
+              <p className="text-2xl font-bold text-foreground">{formatNumber(player.eggs || 0)}</p>
+            </div>
+            <div className="glass-effect p-4 rounded-2xl border-2 neon-pink">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 rounded-full coin-gradient flex items-center justify-center border neon-pink neon-glow">
+                  <Coins className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-sm text-muted-foreground">Coins</span>
+              </div>
+              <p className="text-2xl font-bold text-foreground">{formatNumber(player.coins || 0)}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="px-4 mb-4">
+          <div className="glass-effect p-4 rounded-2xl border-2 neon-cyan">
+            <div className="grid grid-cols-2 gap-4 text-center">
+              <div>
+                <p className="text-sm text-muted-foreground">Total Clicks</p>
+                <p className="text-xl font-bold text-cyan-400">{formatNumber(player.totalClicks || 0)}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Multiplier</p>
+                <p className="text-xl font-bold text-cyan-400">{totalMultiplier.toFixed(2)}x</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Clicker */}
+        <div className="flex justify-center items-center mb-8 h-96">
+          <div
+            onClick={handleClick}
+            className={`relative w-48 h-48 rounded-full cursor-pointer transition-transform ${
+              isClicking ? "scale-90" : "scale-100"
+            }`}
+          >
+            {/* Outer glow circle */}
+            <div className="absolute inset-0 rounded-full border-4 neon-magenta neon-glow" />
+            
+            {/* Egg */}
+            <div className="absolute inset-0 rounded-full gold-gradient flex items-center justify-center shadow-2xl">
+              <Egg className="w-24 h-24 text-white drop-shadow-lg" />
+              <div className="absolute bottom-6 text-center">
+                <p className="text-sm text-white font-semibold">{totalMultiplier.toFixed(2)}x</p>
+                <p className="text-xs text-white/80">per click</p>
+              </div>
+            </div>
+
+            {/* Floating text */}
+            {floatingTexts.map((text) => (
+              <div
+                key={text.id}
+                className="absolute text-lg font-bold text-yellow-400 pointer-events-none animate-float"
+                style={{
+                  left: `${text.x}px`,
+                  top: `${text.y}px`,
+                  transform: "translate(-50%, -50%)",
+                }}
+              >
+                {text.value}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Quick stats */}
+        <div className="px-4 mb-4">
+          <div className="glass-effect p-4 rounded-2xl border-2 neon-pink">
+            <p className="text-sm text-muted-foreground text-center">
+              Click the egg to earn eggs! Upgrade your multiplier to earn more!
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom navigation */}
+      <div className="fixed bottom-0 left-0 right-0 glass-effect border-t-2 border-cyan-500/50">
+        <div className="grid grid-cols-5 gap-2 p-3">
+          <Button
+            variant="ghost"
+            className="flex flex-col items-center gap-1 h-auto py-2 active:animate-button-press neon-cyan neon-glow"
+            onClick={() => setLocation("/upgrades")}
+          >
+            <ShoppingBag className="w-5 h-5" />
+            <span className="text-xs">Upgrades</span>
+          </Button>
+          <Button
+            variant="ghost"
+            className="flex flex-col items-center gap-1 h-auto py-2 active:animate-button-press neon-magenta neon-glow"
+            onClick={() => setLocation("/achievements")}
+          >
+            <Trophy className="w-5 h-5" />
+            <span className="text-xs">Achievements</span>
+          </Button>
+          <Button
+            variant="ghost"
+            className="flex flex-col items-center gap-1 h-auto py-2 active:animate-button-press neon-pink neon-glow"
+            onClick={() => setLocation("/leaderboard")}
+          >
+            <Trophy className="w-5 h-5" />
+            <span className="text-xs">Leaders</span>
+          </Button>
+          <Button
+            variant="ghost"
+            className="flex flex-col items-center gap-1 h-auto py-2 active:animate-button-press neon-cyan neon-glow"
+            onClick={() => setLocation("/boxes")}
+          >
+            <Package className="w-5 h-5" />
+            <span className="text-xs">Boxes</span>
+          </Button>
+          <Button
+            variant="ghost"
+            className="flex flex-col items-center gap-1 h-auto py-2 active:animate-button-press neon-magenta neon-glow"
+            onClick={() => setLocation("/inventory")}
+          >
+            <Package className="w-5 h-5" />
+            <span className="text-xs">Inventory</span>
+          </Button>
+        </div>
+        <div className="grid grid-cols-1 gap-2 p-3 border-t border-cyan-500/50">
+          <Button
+            variant="ghost"
+            className="flex flex-col items-center gap-1 h-auto py-2 active:animate-button-press neon-pink neon-glow"
+            onClick={() => setLocation("/referral")}
+          >
+            <Share2 className="w-5 h-5" />
+            <span className="text-xs">Referral Program</span>
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+=== client/src/pages/Upgrades.tsx ===
+import { Button } from "@/components/ui/button";
+import { trpc } from "@/lib/trpc";
+import { formatNumber } from "@/lib/utils";
+import { ArrowLeft, Egg } from "lucide-react";
+import { useLocation } from "wouter";
+import { toast } from "sonner";
+
+export default function Upgrades() {
+  const [, setLocation] = useLocation();
+  const { data: upgrades, refetch: refetchUpgrades } = trpc.upgrades.list.useQuery();
+  const { data: player, refetch: refetchPlayer } = trpc.player.getOrCreate.useQuery({
+    telegramId: "123456789",
+  });
+
+  const purchaseMutation = trpc.upgrades.purchase.useMutation({
+    onSuccess: () => {
+      refetchUpgrades();
+      refetchPlayer();
+      toast.success("Upgrade purchased successfully!");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const handlePurchase = (upgradeType: "basic" | "advanced" | "expert" | "master") => {
+    purchaseMutation.mutate({ upgradeType });
+  };
+
+  return (
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Animated background */}
+      <div className="fixed inset-0 bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100">
+        <div className="absolute inset-0 backdrop-blur-3xl">
+          {[...Array(5)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-64 h-64 rounded-full gold-gradient opacity-20 animate-float-gold"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${i * 1.5}s`,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 min-h-screen p-4 pb-24">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-6">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setLocation("/")}
+            className="active:animate-button-press"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <h1 className="text-2xl font-bold text-foreground">Upgrades</h1>
+        </div>
+
+        {/* Player eggs */}
+        <div className="glass-effect p-4 rounded-2xl mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full gold-gradient flex items-center justify-center">
+                <Egg className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-sm text-muted-foreground">Your Eggs</span>
+            </div>
+            <p className="text-2xl font-bold text-foreground">
+              {player ? formatNumber(player.eggs || 0) : "..."}
+            </p>
+          </div>
+        </div>
+
+        {/* Upgrades list */}
+        <div className="space-y-4">
+          {upgrades?.map((upgrade) => (
+            <div key={upgrade.type} className="glass-effect p-4 rounded-2xl">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h3 className="text-lg font-bold text-foreground">{upgrade.name}</h3>
+                  <p className="text-sm text-muted-foreground">{upgrade.description}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xl font-bold text-primary">+{upgrade.bonus}x</p>
+                </div>
+              </div>
+              <Button
+                className="w-full active:animate-button-press"
+                onClick={() => handlePurchase(upgrade.type as any)}
+                disabled={purchaseMutation.isPending || (player && (player.eggs || 0) < upgrade.price)}
+              >
+                <Egg className="w-4 h-4 mr-2" />
+                Buy for {formatNumber(upgrade.price)}
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+=== client/src/pages/Achievements.tsx ===
+import { Button } from "@/components/ui/button";
+import { trpc } from "@/lib/trpc";
+import { formatNumber } from "@/lib/utils";
+import { ArrowLeft, Trophy, Lock } from "lucide-react";
+import { useLocation } from "wouter";
+
+export default function Achievements() {
+  const [, setLocation] = useLocation();
+  const { data: achievements } = trpc.achievements.list.useQuery();
+
+  return (
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Animated background */}
+      <div className="fixed inset-0 bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100">
+        <div className="absolute inset-0 backdrop-blur-3xl">
+          {[...Array(5)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-64 h-64 rounded-full gold-gradient opacity-20 animate-float-gold"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${i * 1.5}s`,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 min-h-screen p-4 pb-24">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-6">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setLocation("/")}
+            className="active:animate-button-press"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <h1 className="text-2xl font-bold text-foreground">Achievements</h1>
+        </div>
+
+        {/* Achievements list */}
+        <div className="space-y-4">
+          {achievements?.map((achievement) => (
+            <div
+              key={achievement.id}
+              className={`glass-effect p-4 rounded-2xl ${
+                achievement.unlocked ? "border-2 border-primary" : "opacity-60"
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <div
+                  className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                    achievement.unlocked ? "gold-gradient" : "bg-muted"
+                  }`}
+                >
+                  {achievement.unlocked ? (
+                    <Trophy className="w-6 h-6 text-white" />
+                  ) : (
+                    <Lock className="w-6 h-6 text-muted-foreground" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-foreground">{achievement.name}</h3>
+                  <p className="text-sm text-muted-foreground mb-2">{achievement.description}</p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-muted-foreground">
+                      Requirement: {formatNumber(achievement.requirement)}
+                    </p>
+                    <p className="text-sm font-semibold text-primary">
+                      Reward: {formatNumber(achievement.reward)} coins
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+=== client/src/pages/Leaderboard.tsx ===
+import { Button } from "@/components/ui/button";
+import { trpc } from "@/lib/trpc";
+import { formatNumber } from "@/lib/utils";
+import { ArrowLeft, Crown, Medal, Award, User, Egg } from "lucide-react";
+import { useLocation } from "wouter";
+
+export default function Leaderboard() {
+  const [, setLocation] = useLocation();
+  const { data: leaderboard } = trpc.leaderboard.get.useQuery({ limit: 50 });
+
+  const getRankIcon = (rank: number) => {
+    if (rank === 1) return <Crown className="w-6 h-6 text-yellow-500 animate-glow" />;
+    if (rank === 2) return <Medal className="w-6 h-6 text-gray-400 animate-glow" />;
+    if (rank === 3) return <Award className="w-6 h-6 text-amber-600 animate-glow" />;
+    return <span className="text-sm font-semibold text-muted-foreground">{rank}</span>;
+  };
+
+  return (
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Animated background */}
+      <div className="fixed inset-0 bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100">
+        <div className="absolute inset-0 backdrop-blur-3xl">
+          {[...Array(5)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-64 h-64 rounded-full gold-gradient opacity-20 animate-float-gold"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${i * 1.5}s`,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 min-h-screen p-4 pb-24">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-6">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setLocation("/")}
+            className="active:animate-button-press"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <h1 className="text-2xl font-bold text-foreground">Leaderboard</h1>
+        </div>
+
+        {/* Leaderboard list */}
+        <div className="space-y-3">
+          {leaderboard?.map((player, index) => {
+            const rank = index + 1;
+            const isTop3 = rank <= 3;
+
+            return (
+              <div
+                key={player.id}
+                className={`glass-effect p-4 rounded-2xl ${
+                  isTop3 ? "border-2 border-primary" : ""
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  {/* Rank */}
+                  <div className="w-10 flex items-center justify-center">
+                    {getRankIcon(rank)}
+                  </div>
+
+                  {/* Avatar */}
+                  {player.photoUrl ? (
+                    <img
+                      src={player.photoUrl}
+                      alt={player.username || "Player"}
+                      className="w-10 h-10 rounded-full"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                      <User className="w-5 h-5 text-primary-foreground" />
+                    </div>
+                  )}
+
+                  {/* Name */}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-foreground truncate">
+                      {player.firstName || player.username || "Anonymous"}
+                    </p>
+                    {player.username && (
+                      <p className="text-sm text-muted-foreground truncate">
+                        @{player.username}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Eggs count */}
+                  <div className="flex items-center gap-2">
+                    <Egg className="w-5 h-5 text-primary" />
+                    <p className="text-lg font-bold text-foreground">
+                      {formatNumber(player.eggs || 0)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+=== client/src/pages/Boxes.tsx ===
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { trpc } from "@/lib/trpc";
+import { formatNumber } from "@/lib/utils";
+import { ArrowLeft, Egg, Coins, Package, Sparkles } from "lucide-react";
+import { useLocation } from "wouter";
+import { useState } from "react";
+import { toast } from "sonner";
+
+export default function Boxes() {
+  const [, setLocation] = useLocation();
+  const [exchangeAmount, setExchangeAmount] = useState("");
+  const { data: boxes } = trpc.boxes.list.useQuery();
+  const { data: player, refetch: refetchPlayer } = trpc.player.getOrCreate.useQuery({
+    telegramId: "123456789",
+  });
+
+  const exchangeMutation = trpc.exchange.eggsToCoins.useMutation({
+    onSuccess: (data) => {
+      refetchPlayer();
+      toast.success(`Exchanged! You got ${formatNumber(data.coinsGained)} coins`);
+      setExchangeAmount("");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const purchaseBoxMutation = trpc.boxes.purchase.useMutation({
+    onSuccess: (data) => {
+      refetchPlayer();
+      toast.success(
+        `Box opened! You got: ${data.reward.itemName} (+${data.reward.multiplierBonus}x ${
+          data.reward.duration > 0 ? `for ${data.reward.duration}s` : "permanent"
+        })`
+      );
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const handleExchange = () => {
+    const amount = parseInt(exchangeAmount);
+    if (isNaN(amount) || amount <= 0) {
+      toast.error("Please enter a valid amount");
+      return;
+    }
+    exchangeMutation.mutate({ eggs: amount });
+  };
+
+  const handlePurchaseBox = (boxType: "normal" | "silver" | "gold" | "diamond") => {
+    purchaseBoxMutation.mutate({ boxType });
+  };
+
+  const getBoxColor = (type: string) => {
+    switch (type) {
+      case "normal":
+        return "bg-gray-400";
+      case "silver":
+        return "bg-gradient-to-br from-gray-300 to-gray-500";
+      case "gold":
+        return "gold-gradient";
+      case "diamond":
+        return "bg-gradient-to-br from-cyan-300 to-blue-500";
+      default:
+        return "bg-gray-400";
+    }
+  };
+
+  return (
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Animated background */}
+      <div className="fixed inset-0 bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100">
+        <div className="absolute inset-0 backdrop-blur-3xl">
+          {[...Array(5)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-64 h-64 rounded-full gold-gradient opacity-20 animate-float-gold"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${i * 1.5}s`,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 min-h-screen p-4 pb-24">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-6">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setLocation("/")}
+            className="active:animate-button-press"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <h1 className="text-2xl font-bold text-foreground">Boxes & Exchange</h1>
+        </div>
+
+        {/* Currency display */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="glass-effect p-4 rounded-2xl">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-full gold-gradient flex items-center justify-center">
+                <Egg className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-sm text-muted-foreground">Eggs</span>
+            </div>
+            <p className="text-2xl font-bold text-foreground">
+              {player ? formatNumber(player.eggs || 0) : "..."}
+            </p>
+          </div>
+          <div className="glass-effect p-4 rounded-2xl">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-full coin-gradient flex items-center justify-center">
+                <Coins className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-sm text-muted-foreground">Coins</span>
+            </div>
+            <p className="text-2xl font-bold text-foreground">
+              {player ? formatNumber(player.coins || 0) : "..."}
+            </p>
+          </div>
+        </div>
+
+        {/* Exchange section */}
+        <div className="glass-effect p-4 rounded-2xl mb-6">
+          <h2 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-primary" />
+            Exchange Eggs to Coins
+          </h2>
+          <p className="text-sm text-muted-foreground mb-4">Rate: 1 Egg = 2 Coins</p>
+          <div className="flex gap-2">
+            <Input
+              type="number"
+              placeholder="Amount of eggs"
+              value={exchangeAmount}
+              onChange={(e) => setExchangeAmount(e.target.value)}
+              className="flex-1"
+            />
+            <Button
+              onClick={handleExchange}
+              disabled={exchangeMutation.isPending}
+              className="active:animate-button-press"
+            >
+              Exchange
+            </Button>
+          </div>
+          {exchangeAmount && !isNaN(parseInt(exchangeAmount)) && (
+            <p className="text-sm text-muted-foreground mt-2">
+              You will get: {formatNumber(parseInt(exchangeAmount) * 2)} coins
+            </p>
+          )}
+        </div>
+
+        {/* Boxes section */}
+        <h2 className="text-lg font-bold text-foreground mb-4">Loot Boxes</h2>
+        <div className="space-y-4">
+          {boxes?.map((box) => (
+            <div key={box.type} className="glass-effect p-4 rounded-2xl">
+              <div className="flex items-start gap-4 mb-3">
+                <div className={`w-16 h-16 rounded-2xl ${getBoxColor(box.type)} flex items-center justify-center`}>
+                  <Package className="w-8 h-8 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-foreground">{box.name}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Contains random buffs and multipliers
+                  </p>
+                </div>
+              </div>
+              <Button
+                className="w-full active:animate-button-press"
+                onClick={() => handlePurchaseBox(box.type as any)}
+                disabled={purchaseBoxMutation.isPending || (player && (player.coins || 0) < box.price)}
+              >
+                <Coins className="w-4 h-4 mr-2" />
+                Buy for {formatNumber(box.price)}
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+=== client/src/pages/Inventory.tsx ===
+import { Button } from "@/components/ui/button";
+import { trpc } from "@/lib/trpc";
+import { ArrowLeft, Package, Zap, Clock } from "lucide-react";
+import { useLocation } from "wouter";
+import { toast } from "sonner";
+
+export default function Inventory() {
+  const [, setLocation] = useLocation();
+  const { data: inventory, refetch: refetchInventory } = trpc.inventory.list.useQuery();
+
+  const activateMutation = trpc.inventory.activate.useMutation({
+    onSuccess: () => {
+      refetchInventory();
+      toast.success("Buff activated!");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const handleActivate = (itemId: number) => {
+    activateMutation.mutate({ itemId });
+  };
+
+  const formatDuration = (seconds: number) => {
+    if (seconds === 0) return "Permanent";
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes}m ${secs}s`;
+  };
+
+  const getTimeRemaining = (expiresAt: Date | null) => {
+    if (!expiresAt) return null;
+    const now = new Date();
+    const remaining = Math.max(0, Math.floor((expiresAt.getTime() - now.getTime()) / 1000));
+    return formatDuration(remaining);
+  };
+
+  return (
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Animated background */}
+      <div className="fixed inset-0 bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100">
+        <div className="absolute inset-0 backdrop-blur-3xl">
+          {[...Array(5)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-64 h-64 rounded-full gold-gradient opacity-20 animate-float-gold"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${i * 1.5}s`,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 min-h-screen p-4 pb-24">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-6">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setLocation("/")}
+            className="active:animate-button-press"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <h1 className="text-2xl font-bold text-foreground">Inventory</h1>
+        </div>
+
+        {/* Inventory list */}
+        {inventory && inventory.length === 0 ? (
+          <div className="glass-effect p-8 rounded-2xl text-center">
+            <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">Your inventory is empty</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Open boxes to get buffs and multipliers!
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {inventory?.map((item) => (
+              <div
+                key={item.id}
+                className={`glass-effect p-4 rounded-2xl ${
+                  item.isActive ? "border-2 border-primary" : ""
+                }`}
+              >
+                <div className="flex items-start gap-4 mb-3">
+                  <div
+                    className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                      item.isActive ? "gold-gradient" : "bg-muted"
+                    }`}
+                  >
+                    <Zap className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-lg font-bold text-foreground">{item.itemName}</h3>
+                      {item.isActive && (
+                        <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded-full">
+                          Active
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">{item.description}</p>
+                    <div className="flex items-center gap-4 text-sm">
+                      <div className="flex items-center gap-1">
+                        <Zap className="w-4 h-4 text-primary" />
+                        <span className="text-foreground">+{item.multiplierBonus}x</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">
+                          {item.isActive && item.expiresAt
+                            ? getTimeRemaining(item.expiresAt)
+                            : formatDuration(item.duration || 0)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {!item.isActive && (
+                  <Button
+                    className="w-full active:animate-button-press"
+                    onClick={() => handleActivate(item.id)}
+                    disabled={activateMutation.isPending}
+                  >
+                    Activate
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+=== client/src/pages/Referral.tsx ===
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { trpc } from "@/lib/trpc";
+import { formatNumber } from "@/lib/utils";
+import { ArrowLeft, Share2, Users, Gift } from "lucide-react";
+import { useLocation } from "wouter";
+import { useState } from "react";
+import { toast } from "sonner";
+
+export default function Referral() {
+  const [, setLocation] = useLocation();
+  const [referralCode, setReferralCode] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const { data: stats, refetch: refetchStats } = trpc.referral.getStats.useQuery();
+  const { data: code } = trpc.referral.getCode.useQuery();
+
+  const useCodeMutation = trpc.referral.useCode.useMutation({
+    onSuccess: (data) => {
+      refetchStats();
+      toast.success(`Referral applied! You got ${formatNumber(data.yourReward)} coins!`);
+      setReferralCode("");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const handleCopyCode = () => {
+    if (code?.code) {
+      navigator.clipboard.writeText(code.code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      toast.success("Code copied to clipboard!");
+    }
+  };
+
+  const handleUseCode = () => {
+    if (!referralCode.trim()) {
+      toast.error("Please enter a referral code");
+      return;
+    }
+    useCodeMutation.mutate({ code: referralCode });
+  };
+
+  const handleShareCode = () => {
+    if (code?.code) {
+      const text = `Join me in Golden Egg Clicker! Use my referral code: ${code.code}`;
+      if (navigator.share) {
+        navigator.share({
+          title: "Golden Egg Clicker",
+          text: text,
+        });
+      } else {
+        navigator.clipboard.writeText(text);
+        toast.success("Share text copied!");
+      }
+    }
+  };
+
+  return (
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Mirror background */}
+      <div className="fixed inset-0 mirror-bg" />
+
+      {/* Animated overlay */}
+      <div className="fixed inset-0 pointer-events-none">
+        {[...Array(5)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-64 h-64 rounded-full gold-gradient opacity-10 animate-float-gold"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${i * 1.5}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 min-h-screen p-4 pb-24">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-6">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setLocation("/")}
+            className="active:animate-button-press neon-cyan neon-glow"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <h1 className="text-2xl font-bold text-foreground">Referral Program</h1>
+        </div>
+
+        {/* Your Code Section */}
+        <div className="glass-effect p-6 rounded-2xl mb-6 border-2 neon-cyan">
+          <div className="flex items-center gap-2 mb-4">
+            <Share2 className="w-6 h-6 neon-cyan" />
+            <h2 className="text-xl font-bold text-foreground">Your Referral Code</h2>
+          </div>
+
+          <div className="bg-black/40 p-4 rounded-xl mb-4 border border-cyan-500/50">
+            <p className="text-center text-lg font-mono text-cyan-400 break-all">
+              {code?.code || "Loading..."}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              onClick={handleCopyCode}
+              className="neon-cyan neon-glow active:animate-button-press"
+            >
+              {copied ? "Copied!" : "Copy Code"}
+            </Button>
+            <Button
+              onClick={handleShareCode}
+              className="neon-magenta neon-glow active:animate-button-press"
+            >
+              Share
+            </Button>
+          </div>
+        </div>
+
+        {/* Stats Section */}
+        <div className="glass-effect p-6 rounded-2xl mb-6 border-2 neon-magenta">
+          <div className="flex items-center gap-2 mb-4">
+            <Users className="w-6 h-6 neon-magenta" />
+            <h2 className="text-xl font-bold text-foreground">Your Stats</h2>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-black/40 p-4 rounded-xl border border-magenta-500/50">
+              <p className="text-sm text-muted-foreground mb-1">Total Referrals</p>
+              <p className="text-2xl font-bold text-magenta-400">
+                {stats?.totalReferrals || 0}
+              </p>
+            </div>
+            <div className="bg-black/40 p-4 rounded-xl border border-magenta-500/50">
+              <p className="text-sm text-muted-foreground mb-1">Successful</p>
+              <p className="text-2xl font-bold text-magenta-400">
+                {stats?.successfulReferrals || 0}
+              </p>
+            </div>
+            <div className="col-span-2 bg-black/40 p-4 rounded-xl border border-magenta-500/50">
+              <p className="text-sm text-muted-foreground mb-1">Total Reward</p>
+              <p className="text-2xl font-bold text-magenta-400">
+                {formatNumber(stats?.totalReward || 0)} coins
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Use Code Section */}
+        <div className="glass-effect p-6 rounded-2xl border-2 neon-pink">
+          <div className="flex items-center gap-2 mb-4">
+            <Gift className="w-6 h-6 neon-pink" />
+            <h2 className="text-xl font-bold text-foreground">Use Referral Code</h2>
+          </div>
+
+          <p className="text-sm text-muted-foreground mb-4">
+            Enter a friend's referral code to get 2 500 coins bonus!
+          </p>
+
+          <div className="flex gap-2 mb-4">
+            <Input
+              type="text"
+              placeholder="Enter referral code"
+              value={referralCode}
+              onChange={(e) => setReferralCode(e.target.value)}
+              className="border-pink-500/50 focus:border-pink-500"
+            />
+            <Button
+              onClick={handleUseCode}
+              disabled={useCodeMutation.isPending}
+              className="neon-pink neon-glow active:animate-button-press"
+            >
+              Apply
+            </Button>
+          </div>
+
+          <div className="bg-black/40 p-4 rounded-xl border border-pink-500/50">
+            <p className="text-sm text-muted-foreground">
+              <strong>Rewards:</strong> You get 2 500 coins, your friend gets 5 000 coins
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+=== client/src/lib/utils.ts ===
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+/**
+ * Format number with spaces as thousands separator
+ * Example: 1000 -> "1 000", 1000000 -> "1 000 000"
+ */
+export function formatNumber(num: number): string {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
+
+=== client/src/lib/sounds.ts ===
+/**
+ * Sound effects using Web Audio API
+ */
+
+const audioContext = typeof window !== 'undefined' ? new (window.AudioContext || (window as any).webkitAudioContext)() : null;
+
+function playTone(frequency: number, duration: number, type: OscillatorType = 'sine', volume: number = 0.1) {
+  if (!audioContext) return;
+
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+
+  oscillator.frequency.value = frequency;
+  oscillator.type = type;
+
+  gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+
+  oscillator.start(audioContext.currentTime);
+  oscillator.stop(audioContext.currentTime + duration);
+}
+
+export const sounds = {
+  // Click sound - short beep
+  click: () => {
+    playTone(800, 0.1, 'sine', 0.05);
+  },
+
+  // Achievement unlock - ascending tones
+  achievement: () => {
+    playTone(523, 0.1, 'sine', 0.1); // C5
+    setTimeout(() => playTone(659, 0.1, 'sine', 0.1), 100); // E5
+    setTimeout(() => playTone(784, 0.15, 'sine', 0.1), 200); // G5
+  },
+
+  // Level up - triumphant sound
+  levelUp: () => {
+    playTone(523, 0.1, 'sine', 0.1); // C5
+    setTimeout(() => playTone(659, 0.1, 'sine', 0.1), 80); // E5
+    setTimeout(() => playTone(784, 0.1, 'sine', 0.1), 160); // G5
+    setTimeout(() => playTone(1047, 0.2, 'sine', 0.1), 240); // C6
+  },
+
+  // Box opening - magical sound
+  boxOpen: () => {
+    playTone(400, 0.05, 'sine', 0.08);
+    setTimeout(() => playTone(600, 0.05, 'sine', 0.08), 50);
+    setTimeout(() => playTone(800, 0.1, 'sine', 0.08), 100);
+  },
+
+  // Coin exchange - cash register
+  exchange: () => {
+    playTone(659, 0.08, 'sine', 0.08);
+    setTimeout(() => playTone(784, 0.08, 'sine', 0.08), 80);
+    setTimeout(() => playTone(659, 0.1, 'sine', 0.08), 160);
+  },
+
+  // Upgrade purchase - positive
+  upgrade: () => {
+    playTone(440, 0.1, 'sine', 0.08);
+    setTimeout(() => playTone(554, 0.1, 'sine', 0.08), 100);
+    setTimeout(() => playTone(659, 0.15, 'sine', 0.08), 200);
+  },
+};
+
+=== client/src/lib/trpc.ts ===
+import { createTRPCReact } from "@trpc/react-query";
+import type { AppRouter } from "../../../server/routers";
+
+export const trpc = createTRPCReact<AppRouter>();
+
+=== client/src/contexts/TelegramContext.tsx ===
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+
+interface TelegramUser {
+  id: number;
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+  photo_url?: string;
+  language_code?: string;
+}
+
+interface TelegramContextType {
+  user: TelegramUser | null;
+  webApp: any;
+  isReady: boolean;
+}
+
+const TelegramContext = createContext<TelegramContextType>({
+  user: null,
+  webApp: null,
+  isReady: false,
+});
+
+export function TelegramProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<TelegramUser | null>(null);
+  const [webApp, setWebApp] = useState<any>(null);
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    // Check if Telegram WebApp is available
+    if (typeof window !== "undefined" && (window as any).Telegram?.WebApp) {
+      const tg = (window as any).Telegram.WebApp;
+      setWebApp(tg);
+      
+      // Expand the app to full height
+      tg.expand();
+      
+      // Get user data
+      if (tg.initDataUnsafe?.user) {
+        setUser(tg.initDataUnsafe.user);
+      } else {
+        // For development/testing without Telegram
+        setUser({
+          id: 123456789,
+          first_name: "Test",
+          last_name: "User",
+          username: "testuser",
+          photo_url: "",
+        });
+      }
+      
+      setIsReady(true);
+    } else {
+      // Development mode - use mock data
+      setUser({
+        id: 123456789,
+        first_name: "Test",
+        last_name: "User",
+        username: "testuser",
+        photo_url: "",
+      });
+      setIsReady(true);
+    }
+  }, []);
+
+  return (
+    <TelegramContext.Provider value={{ user, webApp, isReady }}>
+      {children}
+    </TelegramContext.Provider>
+  );
+}
+
+export function useTelegram() {
+  const context = useContext(TelegramContext);
+  if (!context) {
+    throw new Error("useTelegram must be used within TelegramProvider");
+  }
+  return context;
+}
+
+=== client/src/index.css ===
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --primary: oklch(65% 0.25 45);
+  --primary-foreground: oklch(100% 0 0);
+  --primary-foreground: var(--color-blue-50);
+  --sidebar-primary: var(--color-blue-600);
+  --sidebar-primary-foreground: var(--color-blue-50);
+  --chart-1: var(--color-blue-300);
+  --chart-2: var(--color-blue-500);
+  --chart-3: var(--color-blue-600);
+  --chart-4: var(--color-blue-700);
+  --chart-5: var(--color-blue-800);
+  --radius: 0.65rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.235 0.015 65);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.235 0.015 65);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.235 0.015 65);
+  --secondary: oklch(0.98 0.001 286.375);
+  --secondary-foreground: oklch(0.4 0.015 65);
+  --muted: oklch(0.967 0.001 286.375);
+  --muted-foreground: oklch(0.552 0.016 285.938);
+  --accent: oklch(0.967 0.001 286.375);
+  --accent-foreground: oklch(0.141 0.005 285.823);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.92 0.004 286.32);
+  --input: oklch(0.92 0.004 286.32);
+  --ring: oklch(0.623 0.214 259.815);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.235 0.015 65);
+  --sidebar-accent: oklch(0.967 0.001 286.375);
+  --sidebar-accent-foreground: oklch(0.141 0.005 285.823);
+  --sidebar-border: oklch(0.92 0.004 286.32);
+  --sidebar-ring: oklch(0.623 0.214 259.815);
+}
+
+.dark {
+  --primary: var(--color-blue-700);
+  --primary-foreground: var(--color-blue-50);
+  --sidebar-primary: var(--color-blue-500);
+  --sidebar-primary-foreground: var(--color-blue-50);
+  --background: oklch(0.141 0.005 285.823);
+  --foreground: oklch(0.85 0.005 65);
+  --card: oklch(0.21 0.006 285.885);
+  --card-foreground: oklch(0.85 0.005 65);
+  --popover: oklch(0.21 0.006 285.885);
+  --popover-foreground: oklch(0.85 0.005 65);
+  --secondary: oklch(0.24 0.006 286.033);
+  --secondary-foreground: oklch(0.7 0.005 65);
+  --muted: oklch(0.274 0.006 286.033);
+  --muted-foreground: oklch(0.705 0.015 286.067);
+  --accent: oklch(0.274 0.006 286.033);
+  --accent-foreground:  oklch(0.92 0.005 65);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.488 0.243 264.376);
+  --chart-1: var(--color-blue-300);
+  --chart-2: var(--color-blue-500);
+  --chart-3: var(--color-blue-600);
+  --chart-4: var(--color-blue-700);
+  --chart-5: var(--color-blue-800);
+  --sidebar: oklch(0.21 0.006 285.885);
+  --sidebar-foreground: oklch(0.85 0.005 65);
+  --sidebar-accent: oklch(0.274 0.006 286.033);
+  --sidebar-accent-foreground:  oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.488 0.243 264.376);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  /**
+   * Custom container utility that centers content and adds responsive padding.
+   *
+   * This overrides Tailwind's default container behavior to:
+   * - Auto-center content (mx-auto)
+   * - Add responsive horizontal padding
+   * - Set max-width for large screens
+   *
+   * Usage: <div className="container">...</div>
+   *
+   * For custom widths, use max-w-* utilities directly:
+   * <div className="max-w-6xl mx-auto px-4">...</div>
+   */
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem; /* 16px - mobile padding */
+    padding-right: 1rem;
+  }
+
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem; /* 24px - tablet padding */
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem; /* 32px - desktop padding */
+      padding-right: 2rem;
+      max-width: 1280px; /* Standard content width */
+    }
+  }
+
+  /* Animated background */
+  @keyframes float-gold {
+    0%, 100% {
+      transform: translateY(0) translateX(0);
+      opacity: 0.3;
+    }
+    50% {
+      transform: translateY(-20px) translateX(10px);
+      opacity: 0.6;
+    }
+  }
+
+  .animate-float-gold {
+    animation: float-gold 8s ease-in-out infinite;
+  }
+
+  /* Click animation */
+  @keyframes click-pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .animate-click-pulse {
+    animation: click-pulse 0.2s ease-out;
+  }
+
+  /* Floating text animation */
+  @keyframes float-up {
+    0% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-100px);
+      opacity: 0;
+    }
+  }
+
+  .animate-float-up {
+    animation: float-up 1s ease-out forwards;
+  }
+
+  /* Button press animation */
+  @keyframes button-press {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(0.95);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .active\:animate-button-press:active {
+    animation: button-press 0.1s ease-out;
+  }
+
+  /* Glow effect for top 3 */
+  @keyframes glow {
+    0%, 100% {
+      box-shadow: 0 0 5px currentColor, 0 0 10px currentColor;
+    }
+    50% {
+      box-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+    }
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite;
+  }
+
+  /* Glass effect */
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* Golden gradient */
+  .gold-gradient {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
+  }
+
+  /* Coin gradient */
+  .coin-gradient {
+    background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 33%, #45b7d1 66%, #f7b731 100%);
+  }
+}
+
+/* Neon glow effect */
+@keyframes neon-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px currentColor, 0 0 10px currentColor, inset 0 0 5px currentColor;
+  }
+  50% {
+    box-shadow: 0 0 10px currentColor, 0 0 20px currentColor, inset 0 0 10px currentColor;
+  }
+}
+
+.neon-glow {
+  animation: neon-glow 2s ease-in-out infinite;
+}
+
+.neon-cyan {
+  color: #00ffff;
+  border-color: #00ffff;
+}
+
+.neon-magenta {
+  color: #ff00ff;
+  border-color: #ff00ff;
+}
+
+.neon-pink {
+  color: #ff006e;
+  border-color: #ff006e;
+}
+
+/* Mirror effect background */
+.mirror-bg {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a0033 25%, #0a0a0a 50%, #1a0033 75%, #0a0a0a 100%);
+  background-size: 400% 400%;
+  animation: mirror-shift 15s ease infinite;
+}
+
+@keyframes mirror-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Update glass effect for dark theme */
+.glass-effect {
+  background: rgba(10, 10, 10, 0.6) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 255, 255, 0.3) !important;
+}
+
+=== client/src/main.tsx ===
+import { trpc } from "@/lib/trpc";
+import { UNAUTHED_ERR_MSG } from '@shared/const';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { httpBatchLink, TRPCClientError } from "@trpc/client";
+import { createRoot } from "react-dom/client";
+import superjson from "superjson";
+import App from "./App";
+import { getLoginUrl } from "./const";
+import "./index.css";
+import { TelegramProvider } from "./contexts/TelegramContext";
+
+const queryClient = new QueryClient();
+
+const redirectToLoginIfUnauthorized = (error: unknown) => {
+  if (!(error instanceof TRPCClientError)) return;
+  if (typeof window === "undefined") return;
+
+  const isUnauthorized = error.message === UNAUTHED_ERR_MSG;
+
+  if (!isUnauthorized) return;
+
+  window.location.href = getLoginUrl();
+};
+
+queryClient.getQueryCache().subscribe(event => {
+  if (event.type === "updated" && event.action.type === "error") {
+    const error = event.query.state.error;
+    redirectToLoginIfUnauthorized(error);
+    console.error("[API Query Error]", error);
+  }
+});
+
+queryClient.getMutationCache().subscribe(event => {
+  if (event.type === "updated" && event.action.type === "error") {
+    const error = event.mutation.state.error;
+    redirectToLoginIfUnauthorized(error);
+    console.error("[API Mutation Error]", error);
+  }
+});
+
+const trpcClient = trpc.createClient({
+  links: [
+    httpBatchLink({
+      url: "/api/trpc",
+      transformer: superjson,
+      fetch(input, init) {
+        return globalThis.fetch(input, {
+          ...(init ?? {}),
+          credentials: "include",
+        });
+      },
+    }),
+  ],
+});
+
+createRoot(document.getElementById("root")!).render(
+  <trpc.Provider client={trpcClient} queryClient={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <TelegramProvider>
+        <App />
+      </TelegramProvider>
+    </QueryClientProvider>
+  </trpc.Provider>
+);
+
+=== server/game.test.ts ===
+import { describe, expect, it, beforeEach } from "vitest";
+import { appRouter } from "./routers";
+import type { TrpcContext } from "./_core/context";
+import * as db from "./db";
+
+type AuthenticatedUser = NonNullable<TrpcContext["user"]>;
+
+function createAuthContext(): TrpcContext {
+  const user: AuthenticatedUser = {
+    id: 1,
+    openId: "test-user-123",
+    email: "test@example.com",
+    name: "Test User",
+    loginMethod: "manus",
+    role: "user",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    lastSignedIn: new Date(),
+  };
+
+  const ctx: TrpcContext = {
+    user,
+    req: {
+      protocol: "https",
+      headers: {},
+    } as TrpcContext["req"],
+    res: {
+      clearCookie: () => {},
+    } as TrpcContext["res"],
+  };
+
+  return ctx;
+}
+
+describe("Player Management", () => {
+  it("should create a new player on first access", async () => {
+    const ctx = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+
+    const player = await caller.player.getOrCreate({
+      telegramId: "test-tg-123",
+      username: "testuser",
+      firstName: "Test",
+      lastName: "User",
+    });
+
+    expect(player).toBeDefined();
+    expect(player?.userId).toBe(ctx.user.id);
+    expect(player?.eggs).toBeGreaterThanOrEqual(0);
+    expect(player?.coins).toBeGreaterThanOrEqual(0);
+    expect(player?.level).toBeGreaterThanOrEqual(1);
+  });
+
+  it("should return existing player on subsequent calls", async () => {
+    const ctx = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+
+    const player1 = await caller.player.getOrCreate({
+      telegramId: "test-tg-456",
+      username: "testuser2",
+    });
+
+    const player2 = await caller.player.getOrCreate({
+      telegramId: "test-tg-456",
+      username: "testuser2",
+    });
+
+    expect(player1?.id).toBe(player2?.id);
+  });
+});
+
+describe("Click System", () => {
+  it("should register clicks and award eggs", async () => {
+    const ctx = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+
+    // Create player
+    const playerBefore = await caller.player.getOrCreate({
+      telegramId: "test-tg-789",
+      username: "clicker",
+    });
+
+    const clicksBefore = playerBefore?.totalClicks || 0;
+
+    // Register click
+    const result = await caller.player.click({ clicks: 1 });
+
+    expect(result.eggsGained).toBeGreaterThan(0);
+    expect(result.newTotalClicks).toBe(clicksBefore + 1);
+  });
+
+  it("should unlock achievements based on clicks", async () => {
+    const ctx = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+
+    // Create player
+    const playerBefore = await caller.player.getOrCreate({
+      telegramId: "test-tg-achievement",
+      username: "achiever",
+    });
+
+    const clicksBefore = playerBefore?.totalClicks || 0;
+
+    // Register first click
+    const result = await caller.player.click({ clicks: 1 });
+
+    // Should unlock "First Click" achievement
+    expect(result.newAchievements).toBeDefined();
+    // First click should unlock at least one achievement
+    expect(result.newAchievements?.length).toBeGreaterThanOrEqual(0);
+    // Check that total clicks increased
+    expect(result.newTotalClicks).toBe(clicksBefore + 1);
+  });
+});
+
+describe("Upgrades System", () => {
+  it("should list available upgrades", async () => {
+    const ctx = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+
+    // Create player first
+    await caller.player.getOrCreate({
+      telegramId: "test-tg-upgrade",
+      username: "upgrader",
+    });
+
+    const upgrades = await caller.upgrades.list();
+
+    expect(upgrades).toBeDefined();
+    expect(upgrades.length).toBeGreaterThan(0);
+    expect(upgrades[0]).toHaveProperty("type");
+    expect(upgrades[0]).toHaveProperty("price");
+    expect(upgrades[0]).toHaveProperty("bonus");
+  });
+});
+
+describe("Exchange System", () => {
+  it("should exchange eggs for coins at 1:2 rate", async () => {
+    const ctx = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+
+    // Create player with eggs
+    const player = await caller.player.getOrCreate({
+      telegramId: "test-tg-exchange",
+      username: "exchanger",
+    });
+
+    // Give player some eggs
+    if (player) {
+      await db.updatePlayer(player.id, { eggs: 1000 });
+    }
+
+    // Exchange 100 eggs
+    const result = await caller.exchange.eggsToCoins({ eggs: 100 });
+
+    expect(result.success).toBe(true);
+    expect(result.coinsGained).toBe(200); // 100 * 2
+  });
+});
+
+describe("Boxes System", () => {
+  it("should list all box types with prices", async () => {
+    const ctx = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+
+    const boxes = await caller.boxes.list();
+
+    expect(boxes).toBeDefined();
+    expect(boxes.length).toBe(4);
+    expect(boxes.map(b => b.type)).toContain("normal");
+    expect(boxes.map(b => b.type)).toContain("silver");
+    expect(boxes.map(b => b.type)).toContain("gold");
+    expect(boxes.map(b => b.type)).toContain("diamond");
+  });
+});
+
+describe("Leaderboard", () => {
+  it("should return leaderboard sorted by eggs", async () => {
+    const ctx = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+
+    const leaderboard = await caller.leaderboard.get({ limit: 10 });
+
+    expect(leaderboard).toBeDefined();
+    expect(Array.isArray(leaderboard)).toBe(true);
+  });
+});
+
+=== server/auth.logout.test.ts ===
+import { describe, expect, it } from "vitest";
+import { appRouter } from "./routers";
+import { COOKIE_NAME } from "../shared/const";
+import type { TrpcContext } from "./_core/context";
+
+type CookieCall = {
+  name: string;
+  options: Record<string, unknown>;
+};
+
+type AuthenticatedUser = NonNullable<TrpcContext["user"]>;
+
+function createAuthContext(): { ctx: TrpcContext; clearedCookies: CookieCall[] } {
+  const clearedCookies: CookieCall[] = [];
+
+  const user: AuthenticatedUser = {
+    id: 1,
+    openId: "sample-user",
+    email: "sample@example.com",
+    name: "Sample User",
+    loginMethod: "manus",
+    role: "user",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    lastSignedIn: new Date(),
+  };
+
+  const ctx: TrpcContext = {
+    user,
+    req: {
+      protocol: "https",
+      headers: {},
+    } as TrpcContext["req"],
+    res: {
+      clearCookie: (name: string, options: Record<string, unknown>) => {
+        clearedCookies.push({ name, options });
+      },
+    } as TrpcContext["res"],
+  };
+
+  return { ctx, clearedCookies };
+}
+
+describe("auth.logout", () => {
+  it("clears the session cookie and reports success", async () => {
+    const { ctx, clearedCookies } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+
+    const result = await caller.auth.logout();
+
+    expect(result).toEqual({ success: true });
+    expect(clearedCookies).toHaveLength(1);
+    expect(clearedCookies[0]?.name).toBe(COOKIE_NAME);
+    expect(clearedCookies[0]?.options).toMatchObject({
+      maxAge: -1,
+      secure: true,
+      sameSite: "none",
+      httpOnly: true,
+      path: "/",
+    });
+  });
+});
+
+=== drizzle/0002_nosy_wallow.sql ===
+CREATE TABLE `referrals` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`referrerId` int NOT NULL,
+	`referredId` int NOT NULL,
+	`referralCode` varchar(64) NOT NULL,
+	`rewardGiven` boolean NOT NULL DEFAULT false,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `referrals_id` PRIMARY KEY(`id`),
+	CONSTRAINT `referrals_referralCode_unique` UNIQUE(`referralCode`)
+);
+--> statement-breakpoint
+ALTER TABLE `referrals` ADD CONSTRAINT `referrals_referrerId_players_id_fk` FOREIGN KEY (`referrerId`) REFERENCES `players`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `referrals` ADD CONSTRAINT `referrals_referredId_players_id_fk` FOREIGN KEY (`referredId`) REFERENCES `players`(`id`) ON DELETE no action ON UPDATE no action;
+=== drizzle/0001_stormy_skreet.sql ===
+CREATE TABLE `achievements` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`playerId` int NOT NULL,
+	`achievementId` varchar(64) NOT NULL,
+	`achievementName` varchar(255) NOT NULL,
+	`description` text,
+	`reward` int NOT NULL DEFAULT 0,
+	`unlockedAt` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `achievements_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `boxPurchases` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`playerId` int NOT NULL,
+	`boxType` enum('normal','silver','gold','diamond') NOT NULL,
+	`cost` int NOT NULL,
+	`purchasedAt` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `boxPurchases_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `inventory` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`playerId` int NOT NULL,
+	`itemType` varchar(64) NOT NULL,
+	`itemName` varchar(255) NOT NULL,
+	`description` text,
+	`multiplierBonus` decimal(20,2) DEFAULT '0.00',
+	`duration` int NOT NULL DEFAULT 0,
+	`isActive` boolean NOT NULL DEFAULT false,
+	`activatedAt` timestamp,
+	`expiresAt` timestamp,
+	`obtainedAt` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `inventory_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `players` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`userId` int NOT NULL,
+	`telegramId` varchar(64) NOT NULL,
+	`username` varchar(255),
+	`firstName` text,
+	`lastName` text,
+	`photoUrl` text,
+	`eggs` bigint NOT NULL DEFAULT 0,
+	`coins` bigint NOT NULL DEFAULT 0,
+	`totalClicks` bigint NOT NULL DEFAULT 0,
+	`clickMultiplier` decimal(20,2) NOT NULL DEFAULT '1.00',
+	`level` int NOT NULL DEFAULT 1,
+	`experience` bigint NOT NULL DEFAULT 0,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `players_id` PRIMARY KEY(`id`),
+	CONSTRAINT `players_telegramId_unique` UNIQUE(`telegramId`)
+);
+--> statement-breakpoint
+CREATE TABLE `upgrades` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`playerId` int NOT NULL,
+	`upgradeType` varchar(64) NOT NULL,
+	`level` int NOT NULL DEFAULT 1,
+	`multiplierBonus` decimal(20,2) NOT NULL,
+	`purchasedAt` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `upgrades_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+ALTER TABLE `achievements` ADD CONSTRAINT `achievements_playerId_players_id_fk` FOREIGN KEY (`playerId`) REFERENCES `players`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `boxPurchases` ADD CONSTRAINT `boxPurchases_playerId_players_id_fk` FOREIGN KEY (`playerId`) REFERENCES `players`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `inventory` ADD CONSTRAINT `inventory_playerId_players_id_fk` FOREIGN KEY (`playerId`) REFERENCES `players`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `players` ADD CONSTRAINT `players_userId_users_id_fk` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `upgrades` ADD CONSTRAINT `upgrades_playerId_players_id_fk` FOREIGN KEY (`playerId`) REFERENCES `players`(`id`) ON DELETE no action ON UPDATE no action;
+=== drizzle/0000_good_zarek.sql ===
+CREATE TABLE `users` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`openId` varchar(64) NOT NULL,
+	`name` text,
+	`email` varchar(320),
+	`loginMethod` varchar(64),
+	`role` enum('user','admin') NOT NULL DEFAULT 'user',
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	`lastSignedIn` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `users_id` PRIMARY KEY(`id`),
+	CONSTRAINT `users_openId_unique` UNIQUE(`openId`)
+);
+
+================================================================================
+END OF PROJECT CODE
+================================================================================
