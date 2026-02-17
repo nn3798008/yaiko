@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Golden Egg Clicker</title>
+    <title>Golden Egg Clicker: New Year Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg-color: #0a0b10;
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --accent-color: #ffcc00;
-            --neon-blue: #00f2ff;
-            --neon-purple: #bc00ff;
+            --bg-color: #05070a;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --gold-accent: #ffcc00;
+            --gold-glow: rgba(255, 204, 0, 0.5);
+            --neon-red: #ff3b30;
             --text-color: #ffffff;
-            --danger: #ff3b30;
+            --ios-glass: rgba(255, 255, 255, 0.1);
         }
 
         * {
@@ -21,7 +22,7 @@
             margin: 0;
             padding: 0;
             -webkit-tap-highlight-color: transparent;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
@@ -31,27 +32,54 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
+            position: relative;
+        }
+
+        /* Background Elements */
+        #snow-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .blurred-tree {
+            position: fixed;
+            bottom: -20px;
+            left: -30px;
+            width: 180px;
+            height: 250px;
+            background: linear-gradient(to top, #0a2e0a, #1a5e1a);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            filter: blur(15px);
+            opacity: 0.4;
+            z-index: 0;
+            pointer-events: none;
         }
 
         /* Header with Profile */
         .header {
-            padding: 15px;
+            padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+            z-index: 10;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
         }
 
         .user-profile {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
         }
 
         .avatar-container {
             position: relative;
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
         }
 
         .avatar-img {
@@ -64,54 +92,51 @@
 
         .avatar-neon {
             position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
             border-radius: 50%;
-            box-shadow: 0 0 10px var(--neon-blue), inset 0 0 5px var(--neon-blue);
+            box-shadow: 0 0 15px var(--gold-accent), inset 0 0 8px var(--gold-accent);
             pointer-events: none;
-            animation: neon-pulse 2s infinite alternate;
+            animation: gold-pulse 2.5s infinite alternate;
         }
 
-        @keyframes neon-pulse {
-            from { opacity: 0.5; box-shadow: 0 0 5px var(--neon-blue); }
-            to { opacity: 1; box-shadow: 0 0 15px var(--neon-blue); }
+        @keyframes gold-pulse {
+            from { opacity: 0.6; box-shadow: 0 0 8px var(--gold-accent); }
+            to { opacity: 1; box-shadow: 0 0 20px var(--gold-accent); }
         }
 
         .user-info .name {
-            font-weight: bold;
-            font-size: 14px;
+            font-weight: 700;
+            font-size: 16px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .user-info .rank {
             font-size: 11px;
-            color: var(--accent-color);
+            color: var(--gold-accent);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
+            font-weight: 800;
         }
 
         /* Stats Display */
         .stats-panel {
             text-align: center;
-            padding: 20px 0;
+            padding: 10px 0;
+            z-index: 10;
         }
 
         .balance {
-            font-size: 42px;
+            font-size: 48px;
             font-weight: 900;
-            color: var(--accent-color);
-            text-shadow: 0 0 20px rgba(255, 204, 0, 0.3);
+            color: var(--gold-accent);
+            text-shadow: 0 0 30px rgba(255, 204, 0, 0.4);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-        }
-
-        .income-stats {
-            font-size: 14px;
-            color: rgba(255,255,255,0.6);
-            margin-top: 5px;
+            gap: 12px;
         }
 
         /* The Golden Egg */
@@ -122,66 +147,82 @@
             align-items: center;
             justify-content: center;
             position: relative;
+            z-index: 5;
         }
 
         .egg-wrapper {
             position: relative;
             cursor: pointer;
-            transition: transform 0.1s;
+            transition: transform 0.05s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .egg-wrapper:active {
-            transform: scale(0.95);
+            transform: scale(0.92);
         }
 
         .golden-egg {
-            width: 220px;
-            height: 280px;
-            background: radial-gradient(circle at 30% 30%, #fff9e6 0%, #ffcc00 40%, #b38f00 100%);
-            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            width: 240px;
+            height: 310px;
+            background: radial-gradient(circle at 35% 35%, #fff9e6 0%, #ffcc00 45%, #b38f00 100%);
+            border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
             box-shadow: 
-                inset -10px -20px 30px rgba(0,0,0,0.3),
-                0 20px 50px rgba(255, 204, 0, 0.2);
+                inset -15px -25px 40px rgba(0,0,0,0.4),
+                0 30px 60px rgba(255, 204, 0, 0.25);
             position: relative;
             overflow: hidden;
         }
 
         .egg-shine {
             position: absolute;
-            top: 10%;
-            left: 15%;
-            width: 40px;
-            height: 80px;
-            background: rgba(255,255,255,0.4);
+            top: 12%;
+            left: 18%;
+            width: 50px;
+            height: 100px;
+            background: rgba(255,255,255,0.5);
             border-radius: 50%;
-            transform: rotate(20deg);
-            filter: blur(10px);
+            transform: rotate(25deg);
+            filter: blur(12px);
         }
 
-        /* Floating Text */
-        .floating-text {
-            position: absolute;
-            color: var(--accent-color);
-            font-weight: bold;
-            font-size: 24px;
-            pointer-events: none;
-            animation: float-up 0.8s ease-out forwards;
-            z-index: 100;
+        /* Liquid Glass Buttons */
+        .buy-btn {
+            background: linear-gradient(135deg, rgba(255, 204, 0, 0.3), rgba(255, 204, 0, 0.1));
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 204, 0, 0.4);
+            color: var(--gold-accent);
+            padding: 10px 20px;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2);
+            transition: 0.2s;
+            text-transform: uppercase;
         }
 
-        @keyframes float-up {
-            0% { transform: translateY(0) opacity(1); }
-            100% { transform: translateY(-100px) opacity(0); }
+        .buy-btn:active {
+            transform: scale(0.95);
+            background: rgba(255, 204, 0, 0.4);
+        }
+
+        .buy-btn:disabled {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.2);
+            box-shadow: none;
         }
 
         /* Navigation */
         .nav-bar {
             display: flex;
-            background: rgba(15, 16, 25, 0.95);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding: 10px 5px;
-            padding-bottom: calc(10px + env(safe-area-inset-bottom));
+            background: rgba(10, 12, 18, 0.85);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-top: 1px solid var(--glass-border);
+            padding: 12px 5px;
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            z-index: 100;
         }
 
         .nav-item {
@@ -189,30 +230,38 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
-            color: rgba(255,255,255,0.5);
-            font-size: 10px;
+            gap: 6px;
+            color: rgba(255,255,255,0.4);
+            font-size: 11px;
+            font-weight: 600;
             position: relative;
             cursor: pointer;
         }
 
         .nav-item.active {
-            color: var(--accent-color);
+            color: var(--gold-accent);
         }
 
         .nav-icon {
-            font-size: 20px;
+            font-size: 22px;
+            transition: 0.3s;
+        }
+
+        .nav-item.active .nav-icon {
+            transform: translateY(-3px);
+            filter: drop-shadow(0 0 8px var(--gold-accent));
         }
 
         .dot {
             position: absolute;
             top: -2px;
-            right: 25%;
-            width: 8px;
-            height: 8px;
-            background-color: var(--danger);
+            right: 28%;
+            width: 10px;
+            height: 10px;
+            background-color: var(--neon-red);
             border-radius: 50%;
             border: 2px solid var(--bg-color);
+            box-shadow: 0 0 8px var(--neon-red);
             display: none;
         }
 
@@ -222,48 +271,54 @@
             flex: 1;
             overflow-y: auto;
             padding: 20px;
-            padding-bottom: 100px;
+            padding-bottom: 120px;
+            z-index: 10;
         }
 
         .screen.active {
             display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         h2 {
-            margin-bottom: 20px;
-            font-size: 24px;
-            background: linear-gradient(to right, #fff, var(--accent-color));
+            margin-bottom: 25px;
+            font-size: 28px;
+            font-weight: 900;
+            background: linear-gradient(to right, #fff, var(--gold-accent));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         /* Upgrade Cards */
         .card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 15px;
-            margin-bottom: 12px;
+            background: var(--ios-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
-            gap: 15px;
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: 0.3s;
-        }
-
-        .card.locked {
-            filter: grayscale(1) opacity(0.5);
-            background: rgba(0,0,0,0.2);
+            gap: 18px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
         }
 
         .card-icon {
-            width: 50px;
-            height: 50px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
+            width: 55px;
+            height: 55px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 28px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .card-info {
@@ -271,36 +326,22 @@
         }
 
         .card-title {
-            font-weight: bold;
-            font-size: 16px;
+            font-weight: 800;
+            font-size: 17px;
             margin-bottom: 4px;
         }
 
         .card-desc {
             font-size: 12px;
             color: rgba(255,255,255,0.5);
+            line-height: 1.4;
         }
 
         .card-price {
-            font-weight: bold;
-            color: var(--accent-color);
-            font-size: 14px;
-        }
-
-        .buy-btn {
-            background: var(--accent-color);
-            color: #000;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .buy-btn:disabled {
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.3);
+            font-weight: 900;
+            color: var(--gold-accent);
+            font-size: 15px;
+            margin-top: 5px;
         }
 
         /* Leaderboard */
@@ -308,52 +349,122 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            padding: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 15px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 18px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
         .rank-num {
-            width: 25px;
-            font-weight: bold;
-            color: rgba(255,255,255,0.3);
+            width: 30px;
+            font-weight: 900;
+            font-size: 18px;
+            color: rgba(255,255,255,0.2);
         }
 
         .leader-avatar {
-            width: 35px;
-            height: 35px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
-            border: 1px solid var(--neon-blue);
+            border: 2px solid var(--gold-accent);
         }
 
         .leader-name {
             flex: 1;
-            font-size: 14px;
+            font-size: 15px;
+            font-weight: 700;
         }
 
-        .leader-score {
-            font-weight: bold;
-            color: var(--accent-color);
+        /* Special Leaderboard Styles for 1-3 */
+        .top-1 { border: 2px solid var(--gold-accent); background: linear-gradient(45deg, rgba(255,204,0,0.1), transparent); }
+        .top-2 { border: 2px solid #c0c0c0; }
+        .top-3 { border: 2px solid #cd7f32; }
+
+        .new-year-decor {
+            position: relative;
+        }
+        .new-year-decor::after {
+            content: '🎄';
+            position: absolute;
+            top: -10px;
+            right: -5px;
+            font-size: 16px;
         }
 
-        /* Access Pass Section */
-        .pass-section {
-            background: linear-gradient(45deg, rgba(188, 0, 255, 0.1), rgba(0, 242, 255, 0.1));
-            border: 1px solid var(--neon-purple);
-            padding: 20px;
-            border-radius: 20px;
-            margin-bottom: 25px;
+        /* Anti-Cheat Modal */
+        #cheat-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: #100000;
+            border: 3px solid var(--neon-red);
+            box-shadow: 0 0 30px var(--neon-red);
+            padding: 40px;
+            border-radius: 25px;
             text-align: center;
+            position: relative;
+            max-width: 85%;
         }
 
-        .pass-title {
-            color: var(--neon-purple);
-            font-weight: 900;
+        .modal-content h3 {
+            color: var(--neon-red);
+            font-size: 24px;
+            margin-bottom: 15px;
             text-transform: uppercase;
-            margin-bottom: 10px;
+            font-weight: 900;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 35px;
+            height: 35px;
+            background: var(--neon-red);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255,0,0,0.5);
+        }
+
+        /* Floating Text */
+        .floating-text {
+            position: absolute;
+            color: var(--gold-accent);
+            font-weight: 900;
+            font-size: 28px;
+            pointer-events: none;
+            animation: float-up 0.8s ease-out forwards;
+            z-index: 100;
+            text-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        @keyframes float-up {
+            0% { transform: translateY(0) scale(1) opacity(1); }
+            100% { transform: translateY(-120px) scale(1.5) opacity(0); }
         }
     </style>
 </head>
 <body>
+    <canvas id="snow-canvas"></canvas>
+    <div class="blurred-tree"></div>
+
     <div class="header">
         <div class="user-profile">
             <div class="avatar-container">
@@ -365,9 +476,9 @@
                 <div class="rank" id="user-rank">Новичок</div>
             </div>
         </div>
-        <div class="income-stats">
-            <div id="per-click">Клик: +1</div>
-            <div id="per-sec">Секунда: +0</div>
+        <div style="text-align: right;">
+            <div id="per-click" style="font-size: 12px; color: var(--gold-accent);">Клик: +1</div>
+            <div id="per-sec" style="font-size: 12px; opacity: 0.6;">Секунда: +0</div>
         </div>
     </div>
 
@@ -375,7 +486,7 @@
         <div class="stats-panel">
             <div class="balance">
                 <span id="balance-val">0</span>
-                <span style="font-size: 24px;">🥚</span>
+                <span style="font-size: 28px;">🥚</span>
             </div>
         </div>
         <div class="game-container">
@@ -424,6 +535,15 @@
         </div>
     </nav>
 
+    <div id="cheat-modal">
+        <div class="modal-content">
+            <div class="close-modal" onclick="closeCheatModal()">✕</div>
+            <h3>Внимание!</h3>
+            <p>Не используй авто-кликер!</p>
+            <p style="font-size: 12px; margin-top: 15px; opacity: 0.6;">Играй честно, чтобы попасть в топ.</p>
+        </div>
+    </div>
+
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
@@ -438,11 +558,15 @@
             currentTier: 1,
             upgrades: {},
             achievements: [],
-            passes: [],
             lastUpdate: Date.now(),
             newAchievements: false
         };
 
+        // Anti-Cheat Logic
+        let clickHistory = [];
+        const CHEAT_THRESHOLD = 2; // max clicks
+        const CHEAT_WINDOW = 1; // per 1ms (effectively checking for impossible speed)
+        
         // Configuration
         const TIERS = {
             1: { name: "Бронзовый век", nextPassPrice: 5000 },
@@ -457,23 +581,21 @@
             { id: 'u2', name: 'Гнездо', desc: '+1 в сек', basePrice: 50, power: 1, type: 'auto', tier: 1 },
             { id: 'u3', name: 'Зерно премиум', desc: '+5 к клику', basePrice: 200, power: 5, type: 'click', tier: 1 },
             { id: 'u4', name: 'Инкубатор', desc: '+8 в сек', basePrice: 500, power: 8, type: 'auto', tier: 1 },
-            
             { id: 'u5', name: 'Серебряный молот', desc: '+25 к клику', basePrice: 2000, power: 25, type: 'click', tier: 2 },
             { id: 'u6', name: 'Ферма 2.0', desc: '+40 в сек', basePrice: 4500, power: 40, type: 'auto', tier: 2 },
-            
             { id: 'u7', name: 'Золотой клюв', desc: '+150 к клику', basePrice: 15000, power: 150, type: 'click', tier: 3 },
             { id: 'u8', name: 'Завод яиц', desc: '+250 в сек', basePrice: 35000, power: 250, type: 'auto', tier: 3 }
         ];
 
-        // Add more upgrades dynamically to reach ~50
+        // Fill up to 50 upgrades
         for(let i=9; i<=50; i++) {
-            const tier = Math.floor(i/10) + 1;
+            const tier = Math.min(5, Math.floor(i/10) + 1);
             UPGRADES.push({
                 id: `u${i}`,
                 name: `Апгрейд #${i}`,
-                desc: i % 2 === 0 ? `+${i*10} в сек` : `+${i*5} к клику`,
-                basePrice: Math.floor(100 * Math.pow(2.5, i/2)),
-                power: i % 2 === 0 ? i*10 : i*5,
+                desc: i % 2 === 0 ? `+${i*15} в сек` : `+${i*8} к клику`,
+                basePrice: Math.floor(100 * Math.pow(2.8, i/2.5)),
+                power: i % 2 === 0 ? i*15 : i*8,
                 type: i % 2 === 0 ? 'auto' : 'click',
                 tier: tier
             });
@@ -484,10 +606,46 @@
             ACHIEVEMENTS.push({
                 id: `a${i}`,
                 name: `Достижение ${i}`,
-                desc: `Цель: ${i * 1000} монет`,
-                requirement: i * 1000,
-                type: 'earned'
+                desc: `Накопите ${ (i * 5000).toLocaleString() } яиц`,
+                requirement: i * 5000
             });
+        }
+
+        // Snow Animation
+        const canvas = document.getElementById('snow-canvas');
+        const ctx = canvas.getContext('2d');
+        let snowflakes = [];
+
+        function initSnow() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            for(let i=0; i<100; i++) {
+                snowflakes.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 3 + 1,
+                    d: Math.random() * 1,
+                    v: Math.random() * 1 + 0.5
+                });
+            }
+        }
+
+        function drawSnow() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+            ctx.beginPath();
+            for(let i=0; i<snowflakes.length; i++) {
+                let f = snowflakes[i];
+                ctx.moveTo(f.x, f.y);
+                ctx.arc(f.x, f.y, f.r, 0, Math.PI*2, true);
+                f.y += f.v;
+                f.x += Math.sin(f.d) * 0.5;
+                if(f.y > canvas.height) {
+                    snowflakes[i] = {x: Math.random()*canvas.width, y: -10, r: f.r, d: f.d, v: f.v};
+                }
+            }
+            ctx.fill();
+            requestAnimationFrame(drawSnow);
         }
 
         // Initialization
@@ -496,12 +654,13 @@
             document.getElementById('user-name').innerText = user.first_name;
             if(user.photo_url) document.getElementById('user-avatar').src = user.photo_url;
 
+            initSnow();
+            drawSnow();
             loadGame();
             updateUI();
             
             setInterval(gameLoop, 1000);
             setInterval(saveGame, 5000);
-            setInterval(syncLeaderboard, 10000);
         }
 
         function gameLoop() {
@@ -529,16 +688,12 @@
         }
 
         function checkNotifications() {
-            // Check upgrades
             let canBuyAny = false;
             UPGRADES.forEach(u => {
                 if (u.tier <= state.currentTier) {
-                    const price = getPrice(u);
-                    if (state.coins >= price) canBuyAny = true;
+                    if (state.coins >= getPrice(u)) canBuyAny = true;
                 }
             });
-            
-            // Check pass
             const nextTier = state.currentTier + 1;
             if (TIERS[state.currentTier].nextPassPrice > 0 && state.coins >= TIERS[state.currentTier].nextPassPrice) {
                 canBuyAny = true;
@@ -550,7 +705,7 @@
 
         function getPrice(upgrade) {
             const count = state.upgrades[upgrade.id] || 0;
-            return Math.floor(upgrade.basePrice * Math.pow(1.25, count));
+            return Math.floor(upgrade.basePrice * Math.pow(1.3, count));
         }
 
         function buyUpgrade(id) {
@@ -593,32 +748,26 @@
             document.getElementById('per-sec').innerText = `Секунда: +${state.autoPower}`;
             document.getElementById('user-rank').innerText = TIERS[state.currentTier].name;
 
-            if (document.getElementById('screen-upgrades').classList.contains('active')) {
-                renderUpgrades();
-            }
-            if (document.getElementById('screen-achievements').classList.contains('active')) {
-                renderAchievements();
-            }
-            if (document.getElementById('screen-top').classList.contains('active')) {
-                renderLeaderboard();
-            }
+            if (document.getElementById('screen-upgrades').classList.contains('active')) renderUpgrades();
+            if (document.getElementById('screen-achievements').classList.contains('active')) renderAchievements();
+            if (document.getElementById('screen-top').classList.contains('active')) renderLeaderboard();
         }
 
         function renderUpgrades() {
             const list = document.getElementById('upgrades-list');
             const passCont = document.getElementById('pass-container');
             
-            // Render Pass
             const nextTier = state.currentTier + 1;
             if (TIERS[state.currentTier].nextPassPrice > 0) {
                 const price = TIERS[state.currentTier].nextPassPrice;
                 passCont.innerHTML = `
-                    <div class="pass-section">
-                        <div class="pass-title">Доступ к ${TIERS[nextTier].name}</div>
-                        <p style="font-size: 12px; margin-bottom: 10px; opacity: 0.7;">Разблокируйте новые мощные апгрейды</p>
-                        <button class="buy-btn" onclick="buyPass()" ${state.coins < price ? 'disabled' : ''}>
-                            Купить за ${price.toLocaleString()} 🥚
-                        </button>
+                    <div class="card" style="background: linear-gradient(135deg, rgba(255,204,0,0.15), rgba(0,0,0,0.3)); border: 1px solid var(--gold-accent);">
+                        <div class="card-info">
+                            <div class="card-title" style="color: var(--gold-accent)">ДОСТУП: ${TIERS[nextTier].name}</div>
+                            <div class="card-desc">Откройте новые возможности этой эпохи</div>
+                            <div class="card-price">${price.toLocaleString()} 🥚</div>
+                        </div>
+                        <button class="buy-btn" onclick="buyPass()" ${state.coins < price ? 'disabled' : ''}>Открыть</button>
                     </div>
                 `;
             } else {
@@ -629,9 +778,8 @@
                 const count = state.upgrades[u.id] || 0;
                 const price = getPrice(u);
                 const isLocked = u.tier > state.currentTier;
-                
                 return `
-                    <div class="card ${isLocked ? 'locked' : ''}">
+                    <div class="card" style="opacity: ${isLocked ? 0.3 : 1}">
                         <div class="card-icon">${u.type === 'click' ? '👆' : '⚙️'}</div>
                         <div class="card-info">
                             <div class="card-title">${u.name} [${count}]</div>
@@ -650,7 +798,7 @@
                 const isDone = state.achievements.includes(ach.id);
                 return `
                     <div class="card" style="opacity: ${isDone ? 1 : 0.4}">
-                        <div class="card-icon">${isDone ? '✅' : '🔒'}</div>
+                        <div class="card-icon">${isDone ? '🏆' : '🔒'}</div>
                         <div class="card-info">
                             <div class="card-title">${ach.name}</div>
                             <div class="card-desc">${ach.desc}</div>
@@ -663,45 +811,54 @@
 
         function renderLeaderboard() {
             const list = document.getElementById('leaderboard-list');
-            const mockTop = [
-                { name: "Павел Дуров", score: 999999999, avatar: "https://via.placeholder.com/100" },
-                { name: "Крипто Магнат", score: 50000000, avatar: "https://via.placeholder.com/100" },
-                { name: "Яичный Король", score: 10000000, avatar: "https://via.placeholder.com/100" },
-                { name: "Manus AI", score: 5000000, avatar: "https://via.placeholder.com/100" }
+            const user = tg.initDataUnsafe?.user || { first_name: "Вы" };
+            
+            // Real players only (simulated for demo, but structure is ready for API)
+            const players = [
+                { name: user.first_name + " (Вы)", score: state.totalEarned, avatar: user.photo_url || "https://via.placeholder.com/100" }
             ];
             
-            // Add current user
-            const user = tg.initDataUnsafe?.user || { first_name: "Вы" };
-            mockTop.push({ name: user.first_name + " (Вы)", score: state.totalEarned, avatar: user.photo_url || "https://via.placeholder.com/100" });
-            
-            mockTop.sort((a,b) => b.score - a.score);
+            players.sort((a,b) => b.score - a.score);
 
-            list.innerHTML = mockTop.map((item, index) => `
-                <div class="leaderboard-item">
-                    <div class="rank-num">#${index + 1}</div>
-                    <img src="${item.avatar}" class="leader-avatar">
-                    <div class="leader-name">${item.name}</div>
-                    <div class="leader-score">${Math.floor(item.score).toLocaleString()}</div>
-                </div>
-            `).join('');
+            list.innerHTML = players.map((item, index) => {
+                let specialClass = "";
+                if(index === 0) specialClass = "top-1 new-year-decor";
+                else if(index === 1) specialClass = "top-2";
+                else if(index === 2) specialClass = "top-3";
+
+                return `
+                    <div class="leaderboard-item ${specialClass}">
+                        <div class="rank-num">#${index + 1}</div>
+                        <img src="${item.avatar}" class="leader-avatar">
+                        <div class="leader-name">${item.name}</div>
+                        <div class="leader-score">${Math.floor(item.score).toLocaleString()}</div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
             document.getElementById(`screen-${id}`).classList.add('active');
             event.currentTarget.classList.add('active');
-            
             updateUI();
         }
 
-        // Click Handler
+        // Click Handler with Anti-Cheat
         document.getElementById('egg-btn').addEventListener('click', (e) => {
+            const now = Date.now();
+            clickHistory.push(now);
+            clickHistory = clickHistory.filter(t => now - t < 10); // Check last 10ms
+
+            if (clickHistory.length > CHEAT_THRESHOLD) {
+                showCheatModal();
+                return;
+            }
+
             addCoins(state.clickPower);
             state.totalClicks++;
             
-            // Floating text
             const text = document.createElement('div');
             text.className = 'floating-text';
             text.innerText = `+${state.clickPower}`;
@@ -713,23 +870,28 @@
             tg.HapticFeedback.impactOccurred('light');
         });
 
+        function showCheatModal() {
+            document.getElementById('cheat-modal').style.display = 'flex';
+            tg.HapticFeedback.notificationOccurred('error');
+        }
+
+        function closeCheatModal() {
+            document.getElementById('cheat-modal').style.display = 'none';
+            clickHistory = [];
+        }
+
         // Storage
         function saveGame() {
-            localStorage.setItem('golden_egg_save', JSON.stringify(state));
+            localStorage.setItem('golden_egg_pro_save', JSON.stringify(state));
         }
 
         function loadGame() {
-            const saved = localStorage.getItem('golden_egg_save');
+            const saved = localStorage.getItem('golden_egg_pro_save');
             if (saved) {
                 const parsed = JSON.parse(saved);
                 state = { ...state, ...parsed };
                 recalculateStats();
             }
-        }
-
-        function syncLeaderboard() {
-            // In a real app, you would send state.totalEarned to your server here
-            console.log("Syncing with Telegram servers...");
         }
 
         window.onload = init;
