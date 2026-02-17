@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Golden Egg Clicker: New Year Edition</title>
+    <title>Golden Egg: Spark Evolution</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -11,7 +11,7 @@
             --glass-bg: rgba(255, 255, 255, 0.08);
             --glass-border: rgba(255, 255, 255, 0.15);
             --gold-accent: #ffcc00;
-            --gold-glow: rgba(255, 204, 0, 0.5);
+            --spark-accent: #00f2ff;
             --neon-red: #ff3b30;
             --text-color: #ffffff;
             --ios-glass: rgba(255, 255, 255, 0.1);
@@ -46,40 +46,84 @@
             z-index: 0;
         }
 
-        .blurred-tree {
+        /* Detailed CSS Christmas Tree */
+        .tree-container {
             position: fixed;
-            bottom: -20px;
-            left: -30px;
-            width: 180px;
-            height: 250px;
-            background: linear-gradient(to top, #0a2e0a, #1a5e1a);
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-            filter: blur(15px);
-            opacity: 0.4;
-            z-index: 0;
+            bottom: 80px;
+            left: 10px;
+            width: 120px;
+            height: 180px;
+            filter: blur(2px);
+            opacity: 0.6;
+            z-index: 1;
             pointer-events: none;
+        }
+
+        .tree-layer {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 40px solid transparent;
+            border-right: 40px solid transparent;
+            border-bottom: 60px solid #0a3d0a;
+            filter: drop-shadow(0 0 5px rgba(0,255,0,0.2));
+        }
+        .tree-layer::after {
+            content: '•';
+            position: absolute;
+            color: red;
+            font-size: 10px;
+            bottom: -40px;
+            left: -20px;
+            text-shadow: 20px -10px blue, 40px 0px yellow;
+        }
+
+        .layer-1 { bottom: 80px; border-left-width: 25px; border-right-width: 25px; border-bottom-width: 40px; }
+        .layer-2 { bottom: 50px; border-left-width: 40px; border-right-width: 40px; border-bottom-width: 55px; }
+        .layer-3 { bottom: 10px; border-left-width: 55px; border-right-width: 55px; border-bottom-width: 70px; }
+
+        .tree-trunk {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 15px;
+            height: 20px;
+            background: #3d2b1f;
+        }
+
+        .tree-star {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            color: gold;
+            text-shadow: 0 0 10px gold;
         }
 
         /* Header with Profile */
         .header {
-            padding: 20px;
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 10;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
         }
 
         .user-profile {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
         .avatar-container {
             position: relative;
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
         }
 
         .avatar-img {
@@ -87,183 +131,95 @@
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid transparent;
         }
 
         .avatar-neon {
             position: absolute;
-            top: -3px;
-            left: -3px;
-            right: -3px;
-            bottom: -3px;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
             border-radius: 50%;
-            box-shadow: 0 0 15px var(--gold-accent), inset 0 0 8px var(--gold-accent);
-            pointer-events: none;
-            animation: gold-pulse 2.5s infinite alternate;
+            box-shadow: 0 0 12px var(--gold-accent);
+            border: 2px solid var(--gold-accent);
+            animation: gold-pulse 2s infinite alternate;
         }
 
         @keyframes gold-pulse {
-            from { opacity: 0.6; box-shadow: 0 0 8px var(--gold-accent); }
-            to { opacity: 1; box-shadow: 0 0 20px var(--gold-accent); }
+            from { opacity: 0.5; box-shadow: 0 0 5px var(--gold-accent); }
+            to { opacity: 1; box-shadow: 0 0 15px var(--gold-accent); }
         }
 
-        .user-info .name {
-            font-weight: 700;
-            font-size: 16px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
+        .user-info .name { font-weight: 700; font-size: 14px; }
+        .user-info .rank { font-size: 10px; color: var(--gold-accent); font-weight: 800; }
 
-        .user-info .rank {
-            font-size: 11px;
-            color: var(--gold-accent);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-weight: 800;
-        }
-
-        /* Stats Display */
-        .stats-panel {
-            text-align: center;
-            padding: 10px 0;
+        /* Currency Panels */
+        .currency-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 0 20px;
             z-index: 10;
         }
 
-        .balance {
-            font-size: 48px;
-            font-weight: 900;
-            color: var(--gold-accent);
-            text-shadow: 0 0 30px rgba(255, 204, 0, 0.4);
+        .currency-box {
+            background: var(--ios-glass);
+            backdrop-filter: blur(15px);
+            border-radius: 16px;
+            padding: 10px 15px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            gap: 12px;
+            border: 1px solid var(--glass-border);
+            position: relative;
+            overflow: hidden;
         }
 
-        /* The Golden Egg */
+        .currency-label { font-size: 12px; font-weight: 700; opacity: 0.7; }
+        .currency-value { font-size: 22px; font-weight: 900; }
+        .egg-val { color: var(--gold-accent); }
+        .spark-val { color: var(--spark-accent); }
+
+        /* Spark Lizard Animation */
+        .spark-lizard {
+            position: absolute;
+            font-size: 18px;
+            bottom: 2px;
+            right: 10px;
+            animation: lizard-crawl 8s infinite linear;
+            pointer-events: none;
+        }
+
+        @keyframes lizard-crawl {
+            0% { transform: translateX(50px) rotateY(0deg); }
+            45% { transform: translateX(-250px) rotateY(0deg); }
+            50% { transform: translateX(-250px) rotateY(180deg); }
+            95% { transform: translateX(50px) rotateY(180deg); }
+            100% { transform: translateX(50px) rotateY(0deg); }
+        }
+
+        /* Game Container */
         .game-container {
             flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            position: relative;
             z-index: 5;
         }
 
-        .egg-wrapper {
-            position: relative;
-            cursor: pointer;
-            transition: transform 0.05s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .egg-wrapper:active {
-            transform: scale(0.92);
-        }
-
-        .golden-egg {
-            width: 240px;
-            height: 310px;
+        .egg-btn {
+            width: 220px;
+            height: 280px;
             background: radial-gradient(circle at 35% 35%, #fff9e6 0%, #ffcc00 45%, #b38f00 100%);
             border-radius: 50% 50% 50% 50% / 65% 65% 35% 35%;
-            box-shadow: 
-                inset -15px -25px 40px rgba(0,0,0,0.4),
-                0 30px 60px rgba(255, 204, 0, 0.25);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .egg-shine {
-            position: absolute;
-            top: 12%;
-            left: 18%;
-            width: 50px;
-            height: 100px;
-            background: rgba(255,255,255,0.5);
-            border-radius: 50%;
-            transform: rotate(25deg);
-            filter: blur(12px);
-        }
-
-        /* Liquid Glass Buttons */
-        .buy-btn {
-            background: linear-gradient(135deg, rgba(255, 204, 0, 0.3), rgba(255, 204, 0, 0.1));
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 204, 0, 0.4);
-            color: var(--gold-accent);
-            padding: 10px 20px;
-            border-radius: 14px;
-            font-weight: 800;
-            font-size: 13px;
+            box-shadow: inset -10px -20px 30px rgba(0,0,0,0.4), 0 20px 50px rgba(255, 204, 0, 0.3);
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2);
-            transition: 0.2s;
-            text-transform: uppercase;
-        }
-
-        .buy-btn:active {
-            transform: scale(0.95);
-            background: rgba(255, 204, 0, 0.4);
-        }
-
-        .buy-btn:disabled {
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.2);
-            box-shadow: none;
-        }
-
-        /* Navigation */
-        .nav-bar {
-            display: flex;
-            background: rgba(10, 12, 18, 0.85);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border-top: 1px solid var(--glass-border);
-            padding: 12px 5px;
-            padding-bottom: calc(12px + env(safe-area-inset-bottom));
-            z-index: 100;
-        }
-
-        .nav-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            color: rgba(255,255,255,0.4);
-            font-size: 11px;
-            font-weight: 600;
+            transition: transform 0.05s;
             position: relative;
-            cursor: pointer;
         }
 
-        .nav-item.active {
-            color: var(--gold-accent);
-        }
-
-        .nav-icon {
-            font-size: 22px;
-            transition: 0.3s;
-        }
-
-        .nav-item.active .nav-icon {
-            transform: translateY(-3px);
-            filter: drop-shadow(0 0 8px var(--gold-accent));
-        }
-
-        .dot {
-            position: absolute;
-            top: -2px;
-            right: 28%;
-            width: 10px;
-            height: 10px;
-            background-color: var(--neon-red);
-            border-radius: 50%;
-            border: 2px solid var(--bg-color);
-            box-shadow: 0 0 8px var(--neon-red);
-            display: none;
-        }
+        .egg-btn:active { transform: scale(0.94); }
 
         /* Screens */
         .screen {
@@ -271,199 +227,111 @@
             flex: 1;
             overflow-y: auto;
             padding: 20px;
-            padding-bottom: 120px;
+            padding-bottom: 100px;
             z-index: 10;
         }
 
-        .screen.active {
-            display: block;
-            animation: fadeIn 0.3s ease-out;
+        .screen.active { display: block; animation: fadeIn 0.3s; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Exchange Screen */
+        .exchange-card {
+            background: var(--ios-glass);
+            border-radius: 24px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid var(--glass-border);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .exchange-input {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 2px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+            margin: 20px 0;
         }
 
-        h2 {
-            margin-bottom: 25px;
-            font-size: 28px;
-            font-weight: 900;
-            background: linear-gradient(to right, #fff, var(--gold-accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .exchange-input:focus { border-color: var(--gold-accent); outline: none; }
 
         /* Upgrade Cards */
         .card {
             background: var(--ios-glass);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 18px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-        }
-
-        .card-icon {
-            width: 55px;
-            height: 55px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .card-info {
-            flex: 1;
-        }
-
-        .card-title {
-            font-weight: 800;
-            font-size: 17px;
-            margin-bottom: 4px;
-        }
-
-        .card-desc {
-            font-size: 12px;
-            color: rgba(255,255,255,0.5);
-            line-height: 1.4;
-        }
-
-        .card-price {
-            font-weight: 900;
-            color: var(--gold-accent);
-            font-size: 15px;
-            margin-top: 5px;
-        }
-
-        /* Leaderboard */
-        .leaderboard-item {
+            border-radius: 18px;
+            padding: 15px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             gap: 15px;
-            padding: 15px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 18px;
-            margin-bottom: 10px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .rank-num {
-            width: 30px;
-            font-weight: 900;
-            font-size: 18px;
-            color: rgba(255,255,255,0.2);
-        }
-
-        .leader-avatar {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            border: 2px solid var(--gold-accent);
-        }
-
-        .leader-name {
-            flex: 1;
-            font-size: 15px;
-            font-weight: 700;
-        }
-
-        /* Special Leaderboard Styles for 1-3 */
-        .top-1 { border: 2px solid var(--gold-accent); background: linear-gradient(45deg, rgba(255,204,0,0.1), transparent); }
-        .top-2 { border: 2px solid #c0c0c0; }
-        .top-3 { border: 2px solid #cd7f32; }
-
-        .new-year-decor {
+            border: 1px solid var(--glass-border);
             position: relative;
         }
-        .new-year-decor::after {
-            content: '🎄';
-            position: absolute;
-            top: -10px;
-            right: -5px;
-            font-size: 16px;
-        }
 
-        /* Anti-Cheat Modal */
-        #cheat-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
+        .card.locked { filter: blur(4px); pointer-events: none; opacity: 0.5; }
+
+        .card-icon { font-size: 24px; width: 45px; height: 45px; background: rgba(255,255,255,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .card-info { flex: 1; }
+        .card-title { font-weight: 700; font-size: 15px; }
+        .card-desc { font-size: 11px; opacity: 0.6; }
+        .card-price { font-weight: 800; color: var(--spark-accent); font-size: 14px; }
+
+        /* Liquid Glass Button */
+        .btn-glass {
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
             backdrop-filter: blur(10px);
-        }
-
-        .modal-content {
-            background: #100000;
-            border: 3px solid var(--neon-red);
-            box-shadow: 0 0 30px var(--neon-red);
-            padding: 40px;
-            border-radius: 25px;
-            text-align: center;
-            position: relative;
-            max-width: 85%;
-        }
-
-        .modal-content h3 {
-            color: var(--neon-red);
-            font-size: 24px;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            font-weight: 900;
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 35px;
-            height: 35px;
-            background: var(--neon-red);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 8px 15px;
             color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
+            font-weight: 700;
+            font-size: 12px;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(255,0,0,0.5);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
+
+        .btn-glass:disabled { opacity: 0.3; }
+
+        /* Navigation */
+        .nav-bar {
+            display: flex;
+            background: rgba(5, 7, 10, 0.9);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            padding: 10px 0;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
+            z-index: 100;
+        }
+
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; color: rgba(255,255,255,0.4); cursor: pointer; position: relative; }
+        .nav-item.active { color: var(--gold-accent); }
+        .nav-icon { font-size: 20px; }
+
+        .dot { position: absolute; top: 0; right: 30%; width: 8px; height: 8px; background: var(--neon-red); border-radius: 50%; display: none; }
+
+        /* Anti-Cheat */
+        #cheat-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; display: none; align-items: center; justify-content: center; }
+        .cheat-box { border: 2px solid var(--neon-red); padding: 30px; border-radius: 20px; text-align: center; position: relative; box-shadow: 0 0 30px var(--neon-red); }
+        .close-cheat { position: absolute; top: 10px; right: 10px; color: var(--neon-red); font-size: 24px; cursor: pointer; }
 
         /* Floating Text */
-        .floating-text {
-            position: absolute;
-            color: var(--gold-accent);
-            font-weight: 900;
-            font-size: 28px;
-            pointer-events: none;
-            animation: float-up 0.8s ease-out forwards;
-            z-index: 100;
-            text-shadow: 0 0 10px var(--gold-glow);
-        }
-
-        @keyframes float-up {
-            0% { transform: translateY(0) scale(1) opacity(1); }
-            100% { transform: translateY(-120px) scale(1.5) opacity(0); }
-        }
+        .floating-text { position: absolute; color: var(--gold-accent); font-weight: 900; font-size: 24px; pointer-events: none; animation: float-up 0.6s forwards; z-index: 100; }
+        @keyframes float-up { to { transform: translateY(-100px); opacity: 0; } }
     </style>
 </head>
 <body>
     <canvas id="snow-canvas"></canvas>
-    <div class="blurred-tree"></div>
+    <div class="tree-container">
+        <div class="tree-star">★</div>
+        <div class="tree-layer layer-1"></div>
+        <div class="tree-layer layer-2"></div>
+        <div class="tree-layer layer-3"></div>
+        <div class="tree-trunk"></div>
+    </div>
 
     <div class="header">
         <div class="user-profile">
@@ -473,74 +341,72 @@
             </div>
             <div class="user-info">
                 <div class="name" id="user-name">Загрузка...</div>
-                <div class="rank" id="user-rank">Новичок</div>
+                <div class="rank" id="user-rank">Бронзовый век</div>
             </div>
         </div>
-        <div style="text-align: right;">
-            <div id="per-click" style="font-size: 12px; color: var(--gold-accent);">Клик: +1</div>
-            <div id="per-sec" style="font-size: 12px; opacity: 0.6;">Секунда: +0</div>
+        <div style="text-align: right; font-size: 10px; opacity: 0.6;">
+            <div id="stat-click">Клик: +1</div>
+            <div id="stat-auto">Авто: +0</div>
+        </div>
+    </div>
+
+    <div class="currency-container">
+        <div class="currency-box">
+            <span class="currency-label">ЯЙЦА</span>
+            <span class="currency-value egg-val" id="val-eggs">0</span>
+        </div>
+        <div class="currency-box">
+            <span class="currency-label">SPARK</span>
+            <span class="currency-value spark-val" id="val-spark">0</span>
+            <div class="spark-lizard">🦎</div>
         </div>
     </div>
 
     <div id="screen-game" class="screen active">
-        <div class="stats-panel">
-            <div class="balance">
-                <span id="balance-val">0</span>
-                <span style="font-size: 28px;">🥚</span>
-            </div>
-        </div>
         <div class="game-container">
-            <div class="egg-wrapper" id="egg-btn">
-                <div class="golden-egg">
-                    <div class="egg-shine"></div>
-                </div>
-            </div>
+            <div class="egg-btn" id="egg-btn"></div>
+        </div>
+    </div>
+
+    <div id="screen-exchange" class="screen">
+        <h2 style="margin-bottom: 20px;">Обменник</h2>
+        <div class="exchange-card">
+            <div style="font-size: 14px; opacity: 0.7;">Курс: 1 🥚 = 0.2 🦎</div>
+            <input type="number" id="exchange-input" class="exchange-input" placeholder="Кол-во яиц">
+            <div id="exchange-result" style="margin-bottom: 20px; font-weight: 700; color: var(--spark-accent);">Вы получите: 0 Spark</div>
+            <button class="btn-glass" style="width: 100%; padding: 15px; font-size: 16px;" onclick="performExchange()">ПОДТВЕРДИТЬ ОБМЕН</button>
         </div>
     </div>
 
     <div id="screen-upgrades" class="screen">
-        <h2>Улучшения</h2>
+        <h2 style="margin-bottom: 20px;">Апгрейды</h2>
         <div id="pass-container"></div>
         <div id="upgrades-list"></div>
     </div>
 
     <div id="screen-achievements" class="screen">
-        <h2>Достижения</h2>
+        <h2 style="margin-bottom: 20px;">Достижения</h2>
         <div id="achievements-list"></div>
     </div>
 
     <div id="screen-top" class="screen">
-        <h2>Мировой Топ</h2>
+        <h2 style="margin-bottom: 20px;">Мировой Топ</h2>
         <div id="leaderboard-list"></div>
     </div>
 
     <nav class="nav-bar">
-        <div class="nav-item active" onclick="showScreen('game')">
-            <div class="nav-icon">🎮</div>
-            <span>Игра</span>
-        </div>
-        <div class="nav-item" onclick="showScreen('upgrades')">
-            <div class="nav-icon">⚡</div>
-            <span>Апгрейды</span>
-            <div id="dot-upgrades" class="dot"></div>
-        </div>
-        <div class="nav-item" onclick="showScreen('achievements')">
-            <div class="nav-icon">🏆</div>
-            <span>Ачивки</span>
-            <div id="dot-achievements" class="dot"></div>
-        </div>
-        <div class="nav-item" onclick="showScreen('top')">
-            <div class="nav-icon">📊</div>
-            <span>Топ</span>
-        </div>
+        <div class="nav-item active" onclick="showScreen('game', this)"><div class="nav-icon">🎮</div><span>Игра</span></div>
+        <div class="nav-item" onclick="showScreen('exchange', this)"><div class="nav-icon">🔄</div><span>Обмен</span></div>
+        <div class="nav-item" onclick="showScreen('upgrades', this)"><div class="nav-icon">⚡</div><span>Апгрейды</span><div id="dot-upgrades" class="dot"></div></div>
+        <div class="nav-item" onclick="showScreen('achievements', this)"><div class="nav-icon">🏆</div><span>Ачивки</span><div id="dot-achievements" class="dot"></div></div>
+        <div class="nav-item" onclick="showScreen('top', this)"><div class="nav-icon">📊</div><span>Топ</span></div>
     </nav>
 
     <div id="cheat-modal">
-        <div class="modal-content">
-            <div class="close-modal" onclick="closeCheatModal()">✕</div>
-            <h3>Внимание!</h3>
+        <div class="cheat-box">
+            <div class="close-cheat" onclick="closeCheat()">✕</div>
+            <h2 style="color: var(--neon-red); margin-bottom: 10px;">ЧИТЕР!</h2>
             <p>Не используй авто-кликер!</p>
-            <p style="font-size: 12px; margin-top: 15px; opacity: 0.6;">Играй честно, чтобы попасть в топ.</p>
         </div>
     </div>
 
@@ -548,54 +414,39 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Game State
         let state = {
-            coins: 0,
-            totalEarned: 0,
+            eggs: 0,
+            spark: 0,
+            totalEggs: 0,
+            totalSpark: 0,
             totalClicks: 0,
-            clickPower: 1,
-            autoPower: 0,
-            currentTier: 1,
+            tier: 1,
             upgrades: {},
             achievements: [],
-            lastUpdate: Date.now(),
-            newAchievements: false
+            newAch: false
         };
 
-        // Anti-Cheat Logic
-        let clickHistory = [];
-        const CHEAT_THRESHOLD = 2; // max clicks
-        const CHEAT_WINDOW = 1; // per 1ms (effectively checking for impossible speed)
-        
-        // Configuration
         const TIERS = {
-            1: { name: "Бронзовый век", nextPassPrice: 5000 },
-            2: { name: "Серебряный век", nextPassPrice: 50000 },
-            3: { name: "Золотой век", nextPassPrice: 500000 },
-            4: { name: "Платиновый век", nextPassPrice: 5000000 },
-            5: { name: "Алмазный век", nextPassPrice: 0 }
+            1: { name: "Бронзовый век", pass: 500 },
+            2: { name: "Серебряный век", pass: 5000 },
+            3: { name: "Золотой век", pass: 50000 },
+            4: { name: "Платиновый век", pass: 500000 },
+            5: { name: "Алмазный век", pass: 0 }
         };
 
-        const UPGRADES = [
-            { id: 'u1', name: 'Куриная лапка', desc: '+1 к клику', basePrice: 15, power: 1, type: 'click', tier: 1 },
-            { id: 'u2', name: 'Гнездо', desc: '+1 в сек', basePrice: 50, power: 1, type: 'auto', tier: 1 },
-            { id: 'u3', name: 'Зерно премиум', desc: '+5 к клику', basePrice: 200, power: 5, type: 'click', tier: 1 },
-            { id: 'u4', name: 'Инкубатор', desc: '+8 в сек', basePrice: 500, power: 8, type: 'auto', tier: 1 },
-            { id: 'u5', name: 'Серебряный молот', desc: '+25 к клику', basePrice: 2000, power: 25, type: 'click', tier: 2 },
-            { id: 'u6', name: 'Ферма 2.0', desc: '+40 в сек', basePrice: 4500, power: 40, type: 'auto', tier: 2 },
-            { id: 'u7', name: 'Золотой клюв', desc: '+150 к клику', basePrice: 15000, power: 150, type: 'click', tier: 3 },
-            { id: 'u8', name: 'Завод яиц', desc: '+250 в сек', basePrice: 35000, power: 250, type: 'auto', tier: 3 }
-        ];
-
-        // Fill up to 50 upgrades
-        for(let i=9; i<=50; i++) {
-            const tier = Math.min(5, Math.floor(i/10) + 1);
+        const UPGRADES = [];
+        const names = ["Мышка", "Гнездо", "Инкубатор", "Ферма", "Завод", "Корпорация", "Империя", "Галактика", "Вселенная", "Измерение"];
+        const emojis = ["🖱️", "🪹", "🐣", "🚜", "🏭", "🏢", "👑", "🌌", "🪐", "🌀"];
+        
+        for(let i=1; i<=50; i++) {
+            const tier = Math.min(5, Math.floor((i-1)/10) + 1);
             UPGRADES.push({
                 id: `u${i}`,
-                name: `Апгрейд #${i}`,
-                desc: i % 2 === 0 ? `+${i*15} в сек` : `+${i*8} к клику`,
-                basePrice: Math.floor(100 * Math.pow(2.8, i/2.5)),
-                power: i % 2 === 0 ? i*15 : i*8,
+                name: `${names[(i-1)%10]} v.${Math.ceil(i/10)}`,
+                emoji: emojis[(i-1)%10],
+                desc: i % 2 === 0 ? `+${i*5} в сек` : `+${i*2} к клику`,
+                basePrice: Math.floor(10 * Math.pow(2.5, i/2)),
+                power: i % 2 === 0 ? i*5 : i*2,
                 type: i % 2 === 0 ? 'auto' : 'click',
                 tier: tier
             });
@@ -605,293 +456,216 @@
         for(let i=1; i<=100; i++) {
             ACHIEVEMENTS.push({
                 id: `a${i}`,
-                name: `Достижение ${i}`,
-                desc: `Накопите ${ (i * 5000).toLocaleString() } яиц`,
-                requirement: i * 5000
+                name: `Цель #${i}`,
+                desc: `Соберите ${ (i * 1000).toLocaleString() } яиц`,
+                req: i * 1000
             });
         }
 
-        // Snow Animation
-        const canvas = document.getElementById('snow-canvas');
-        const ctx = canvas.getContext('2d');
-        let snowflakes = [];
-
-        function initSnow() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            for(let i=0; i<100; i++) {
-                snowflakes.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    r: Math.random() * 3 + 1,
-                    d: Math.random() * 1,
-                    v: Math.random() * 1 + 0.5
-                });
-            }
-        }
-
-        function drawSnow() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
-            ctx.beginPath();
-            for(let i=0; i<snowflakes.length; i++) {
-                let f = snowflakes[i];
-                ctx.moveTo(f.x, f.y);
-                ctx.arc(f.x, f.y, f.r, 0, Math.PI*2, true);
-                f.y += f.v;
-                f.x += Math.sin(f.d) * 0.5;
-                if(f.y > canvas.height) {
-                    snowflakes[i] = {x: Math.random()*canvas.width, y: -10, r: f.r, d: f.d, v: f.v};
-                }
-            }
-            ctx.fill();
-            requestAnimationFrame(drawSnow);
-        }
-
-        // Initialization
         function init() {
-            const user = tg.initDataUnsafe?.user || { first_name: "Игрок", id: 0, photo_url: "" };
+            const user = tg.initDataUnsafe?.user || { first_name: "Игрок" };
             document.getElementById('user-name').innerText = user.first_name;
             if(user.photo_url) document.getElementById('user-avatar').src = user.photo_url;
 
+            load();
             initSnow();
-            drawSnow();
-            loadGame();
-            updateUI();
-            
-            setInterval(gameLoop, 1000);
-            setInterval(saveGame, 5000);
+            update();
+            setInterval(() => { addEggs(getAuto()); checkDots(); }, 1000);
+            setInterval(save, 5000);
         }
 
-        function gameLoop() {
-            if (state.autoPower > 0) {
-                addCoins(state.autoPower);
-            }
-            checkNotifications();
+        function getClick() {
+            let p = 1;
+            UPGRADES.filter(u => u.type === 'click').forEach(u => p += (state.upgrades[u.id] || 0) * u.power);
+            return p;
         }
 
-        function addCoins(amount) {
-            state.coins += amount;
-            state.totalEarned += amount;
-            updateUI();
-            checkAchievements();
+        function getAuto() {
+            let p = 0;
+            UPGRADES.filter(u => u.type === 'auto').forEach(u => p += (state.upgrades[u.id] || 0) * u.power);
+            return p;
         }
 
-        function checkAchievements() {
-            ACHIEVEMENTS.forEach(ach => {
-                if (!state.achievements.includes(ach.id) && state.totalEarned >= ach.requirement) {
-                    state.achievements.push(ach.id);
-                    state.newAchievements = true;
+        function addEggs(n) {
+            state.eggs += n;
+            state.totalEggs += n;
+            update();
+            checkAch();
+        }
+
+        function checkAch() {
+            ACHIEVEMENTS.forEach(a => {
+                if(!state.achievements.includes(a.id) && state.totalEggs >= a.req) {
+                    state.achievements.push(a.id);
+                    state.newAch = true;
                     tg.HapticFeedback.notificationOccurred('success');
                 }
             });
         }
 
-        function checkNotifications() {
-            let canBuyAny = false;
-            UPGRADES.forEach(u => {
-                if (u.tier <= state.currentTier) {
-                    if (state.coins >= getPrice(u)) canBuyAny = true;
-                }
-            });
-            const nextTier = state.currentTier + 1;
-            if (TIERS[state.currentTier].nextPassPrice > 0 && state.coins >= TIERS[state.currentTier].nextPassPrice) {
-                canBuyAny = true;
+        function update() {
+            document.getElementById('val-eggs').innerText = Math.floor(state.eggs).toLocaleString();
+            document.getElementById('val-spark').innerText = state.spark.toFixed(1);
+            document.getElementById('stat-click').innerText = `Клик: +${getClick()}`;
+            document.getElementById('stat-auto').innerText = `Авто: +${getAuto()}`;
+            document.getElementById('user-rank').innerText = TIERS[state.tier].name;
+        }
+
+        function performExchange() {
+            const input = document.getElementById('exchange-input');
+            const val = parseFloat(input.value);
+            if(val > 0 && state.eggs >= val) {
+                state.eggs -= val;
+                const gain = val * 0.2;
+                state.spark += gain;
+                state.totalSpark += gain;
+                input.value = "";
+                document.getElementById('exchange-result').innerText = "Вы получите: 0 Spark";
+                update();
+                tg.HapticFeedback.notificationOccurred('success');
             }
-
-            document.getElementById('dot-upgrades').style.display = canBuyAny ? 'block' : 'none';
-            document.getElementById('dot-achievements').style.display = state.newAchievements ? 'block' : 'none';
         }
 
-        function getPrice(upgrade) {
-            const count = state.upgrades[upgrade.id] || 0;
-            return Math.floor(upgrade.basePrice * Math.pow(1.3, count));
-        }
+        document.getElementById('exchange-input').oninput = function() {
+            const val = parseFloat(this.value) || 0;
+            document.getElementById('exchange-result').innerText = `Вы получите: ${(val * 0.2).toFixed(1)} Spark`;
+        };
 
         function buyUpgrade(id) {
             const u = UPGRADES.find(x => x.id === id);
-            const price = getPrice(u);
-            if (state.coins >= price) {
-                state.coins -= price;
+            const price = Math.floor(u.basePrice * Math.pow(1.4, state.upgrades[id] || 0));
+            if(state.spark >= price) {
+                state.spark -= price;
                 state.upgrades[id] = (state.upgrades[id] || 0) + 1;
-                recalculateStats();
-                updateUI();
+                update();
+                renderUpgrades();
                 tg.HapticFeedback.impactOccurred('medium');
             }
         }
 
         function buyPass() {
-            const price = TIERS[state.currentTier].nextPassPrice;
-            if (state.coins >= price) {
-                state.coins -= price;
-                state.currentTier++;
-                updateUI();
+            const price = TIERS[state.tier].pass;
+            if(state.spark >= price) {
+                state.spark -= price;
+                state.tier++;
+                update();
+                renderUpgrades();
                 tg.HapticFeedback.notificationOccurred('success');
             }
         }
 
-        function recalculateStats() {
-            let cp = 1;
-            let ap = 0;
-            UPGRADES.forEach(u => {
-                const count = state.upgrades[u.id] || 0;
-                if (u.type === 'click') cp += u.power * count;
-                else ap += u.power * count;
-            });
-            state.clickPower = cp;
-            state.autoPower = ap;
-        }
-
-        function updateUI() {
-            document.getElementById('balance-val').innerText = Math.floor(state.coins).toLocaleString();
-            document.getElementById('per-click').innerText = `Клик: +${state.clickPower}`;
-            document.getElementById('per-sec').innerText = `Секунда: +${state.autoPower}`;
-            document.getElementById('user-rank').innerText = TIERS[state.currentTier].name;
-
-            if (document.getElementById('screen-upgrades').classList.contains('active')) renderUpgrades();
-            if (document.getElementById('screen-achievements').classList.contains('active')) renderAchievements();
-            if (document.getElementById('screen-top').classList.contains('active')) renderLeaderboard();
-        }
-
         function renderUpgrades() {
             const list = document.getElementById('upgrades-list');
-            const passCont = document.getElementById('pass-container');
+            const pass = document.getElementById('pass-container');
             
-            const nextTier = state.currentTier + 1;
-            if (TIERS[state.currentTier].nextPassPrice > 0) {
-                const price = TIERS[state.currentTier].nextPassPrice;
-                passCont.innerHTML = `
-                    <div class="card" style="background: linear-gradient(135deg, rgba(255,204,0,0.15), rgba(0,0,0,0.3)); border: 1px solid var(--gold-accent);">
-                        <div class="card-info">
-                            <div class="card-title" style="color: var(--gold-accent)">ДОСТУП: ${TIERS[nextTier].name}</div>
-                            <div class="card-desc">Откройте новые возможности этой эпохи</div>
-                            <div class="card-price">${price.toLocaleString()} 🥚</div>
-                        </div>
-                        <button class="buy-btn" onclick="buyPass()" ${state.coins < price ? 'disabled' : ''}>Открыть</button>
-                    </div>
-                `;
-            } else {
-                passCont.innerHTML = '';
-            }
+            if(TIERS[state.tier].pass > 0) {
+                const p = TIERS[state.tier].pass;
+                pass.innerHTML = `<div class="card" style="border-color: var(--gold-accent)">
+                    <div class="card-info"><div class="card-title">ПРОПУСК: ${TIERS[state.tier+1].name}</div><div class="card-price">${p} Spark</div></div>
+                    <button class="btn-glass" onclick="buyPass()" ${state.spark < p ? 'disabled' : ''}>ОТКРЫТЬ</button>
+                </div>`;
+            } else pass.innerHTML = "";
 
             list.innerHTML = UPGRADES.map(u => {
                 const count = state.upgrades[u.id] || 0;
-                const price = getPrice(u);
-                const isLocked = u.tier > state.currentTier;
-                return `
-                    <div class="card" style="opacity: ${isLocked ? 0.3 : 1}">
-                        <div class="card-icon">${u.type === 'click' ? '👆' : '⚙️'}</div>
-                        <div class="card-info">
-                            <div class="card-title">${u.name} [${count}]</div>
-                            <div class="card-desc">${u.desc}</div>
-                            <div class="card-price">${price.toLocaleString()} 🥚</div>
-                        </div>
-                        ${!isLocked ? `<button class="buy-btn" onclick="buyUpgrade('${u.id}')" ${state.coins < price ? 'disabled' : ''}>Купить</button>` : '🔒'}
-                    </div>
-                `;
+                const price = Math.floor(u.basePrice * Math.pow(1.4, count));
+                const locked = u.tier > state.tier;
+                return `<div class="card ${locked ? 'locked' : ''}">
+                    <div class="card-icon">${u.emoji}</div>
+                    <div class="card-info"><div class="card-title">${u.name} [${count}]</div><div class="card-desc">${u.desc}</div><div class="card-price">${price} Spark</div></div>
+                    <button class="btn-glass" onclick="buyUpgrade('${u.id}')" ${state.spark < price ? 'disabled' : ''}>КУПИТЬ</button>
+                </div>`;
             }).join('');
         }
 
         function renderAchievements() {
-            const list = document.getElementById('achievements-list');
-            list.innerHTML = ACHIEVEMENTS.map(ach => {
-                const isDone = state.achievements.includes(ach.id);
-                return `
-                    <div class="card" style="opacity: ${isDone ? 1 : 0.4}">
-                        <div class="card-icon">${isDone ? '🏆' : '🔒'}</div>
-                        <div class="card-info">
-                            <div class="card-title">${ach.name}</div>
-                            <div class="card-desc">${ach.desc}</div>
-                        </div>
-                    </div>
-                `;
+            document.getElementById('achievements-list').innerHTML = ACHIEVEMENTS.map(a => {
+                const done = state.achievements.includes(a.id);
+                return `<div class="card" style="opacity: ${done ? 1 : 0.3}">
+                    <div class="card-icon">${done ? '✅' : '🔒'}</div>
+                    <div class="card-info"><div class="card-title">${a.name}</div><div class="card-desc">${a.desc}</div></div>
+                </div>`;
             }).join('');
-            state.newAchievements = false;
+            state.newAch = false;
         }
 
-        function renderLeaderboard() {
-            const list = document.getElementById('leaderboard-list');
-            const user = tg.initDataUnsafe?.user || { first_name: "Вы" };
-            
-            // Real players only (simulated for demo, but structure is ready for API)
-            const players = [
-                { name: user.first_name + " (Вы)", score: state.totalEarned, avatar: user.photo_url || "https://via.placeholder.com/100" }
-            ];
-            
-            players.sort((a,b) => b.score - a.score);
-
-            list.innerHTML = players.map((item, index) => {
-                let specialClass = "";
-                if(index === 0) specialClass = "top-1 new-year-decor";
-                else if(index === 1) specialClass = "top-2";
-                else if(index === 2) specialClass = "top-3";
-
-                return `
-                    <div class="leaderboard-item ${specialClass}">
-                        <div class="rank-num">#${index + 1}</div>
-                        <img src="${item.avatar}" class="leader-avatar">
-                        <div class="leader-name">${item.name}</div>
-                        <div class="leader-score">${Math.floor(item.score).toLocaleString()}</div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function showScreen(id) {
+        function showScreen(id, el) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(`screen-${id}`).classList.add('active');
-            event.currentTarget.classList.add('active');
-            updateUI();
+            if(el) el.classList.add('active');
+            else {
+                const navItems = document.querySelectorAll('.nav-item');
+                const index = ['game', 'exchange', 'upgrades', 'achievements', 'top'].indexOf(id);
+                if(index !== -1) navItems[index].classList.add('active');
+            }
+            if(id === 'upgrades') renderUpgrades();
+            if(id === 'achievements') renderAchievements();
+            if(id === 'top') renderTop();
         }
 
-        // Click Handler with Anti-Cheat
-        document.getElementById('egg-btn').addEventListener('click', (e) => {
+        function renderTop() {
+            const user = tg.initDataUnsafe?.user || { first_name: "Вы" };
+            document.getElementById('leaderboard-list').innerHTML = `
+                <div class="card" style="border: 2px solid var(--gold-accent)">
+                    <div class="card-icon">👑</div>
+                    <div class="card-info"><div class="card-title">${user.first_name} (Вы)</div><div class="card-desc">Всего яиц: ${state.totalEggs.toLocaleString()}</div></div>
+                </div>
+            `;
+        }
+
+        let lastClick = 0;
+        let clickCount = 0;
+        document.getElementById('egg-btn').onclick = function(e) {
             const now = Date.now();
-            clickHistory.push(now);
-            clickHistory = clickHistory.filter(t => now - t < 10); // Check last 10ms
+            if(now - lastClick < 1) {
+                clickCount++;
+                if(clickCount > 2) { document.getElementById('cheat-modal').style.display = 'flex'; return; }
+            } else { clickCount = 0; }
+            lastClick = now;
 
-            if (clickHistory.length > CHEAT_THRESHOLD) {
-                showCheatModal();
-                return;
-            }
-
-            addCoins(state.clickPower);
-            state.totalClicks++;
-            
-            const text = document.createElement('div');
-            text.className = 'floating-text';
-            text.innerText = `+${state.clickPower}`;
-            text.style.left = `${e.clientX}px`;
-            text.style.top = `${e.clientY}px`;
-            document.body.appendChild(text);
-            setTimeout(() => text.remove(), 800);
-            
+            addEggs(getClick());
+            const f = document.createElement('div');
+            f.className = 'floating-text';
+            f.innerText = `+${getClick()}`;
+            f.style.left = e.clientX + 'px';
+            f.style.top = e.clientY + 'px';
+            document.body.appendChild(f);
+            setTimeout(() => f.remove(), 600);
             tg.HapticFeedback.impactOccurred('light');
-        });
+        };
 
-        function showCheatModal() {
-            document.getElementById('cheat-modal').style.display = 'flex';
-            tg.HapticFeedback.notificationOccurred('error');
+        function closeCheat() { document.getElementById('cheat-modal').style.display = 'none'; clickCount = 0; }
+
+        function checkDots() {
+            let canBuy = false;
+            UPGRADES.forEach(u => {
+                if(u.tier <= state.tier && state.spark >= Math.floor(u.basePrice * Math.pow(1.4, state.upgrades[u.id] || 0))) canBuy = true;
+            });
+            if(TIERS[state.tier].pass > 0 && state.spark >= TIERS[state.tier].pass) canBuy = true;
+            document.getElementById('dot-upgrades').style.display = canBuy ? 'block' : 'none';
+            document.getElementById('dot-achievements').style.display = state.newAch ? 'block' : 'none';
         }
 
-        function closeCheatModal() {
-            document.getElementById('cheat-modal').style.display = 'none';
-            clickHistory = [];
-        }
+        function save() { localStorage.setItem('egg_spark_save', JSON.stringify(state)); }
+        function load() { const s = localStorage.getItem('egg_spark_save'); if(s) state = JSON.parse(s); }
 
-        // Storage
-        function saveGame() {
-            localStorage.setItem('golden_egg_pro_save', JSON.stringify(state));
+        const canvas = document.getElementById('snow-canvas');
+        const ctx = canvas.getContext('2d');
+        let snow = [];
+        function initSnow() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            for(let i=0; i<80; i++) snow.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*3+1, v: Math.random()*1+0.5});
+            drawSnow();
         }
-
-        function loadGame() {
-            const saved = localStorage.getItem('golden_egg_pro_save');
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                state = { ...state, ...parsed };
-                recalculateStats();
-            }
+        function drawSnow() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.fillStyle = "white"; ctx.beginPath();
+            snow.forEach(s => {
+                ctx.moveTo(s.x, s.y); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+                s.y += s.v; if(s.y > canvas.height) s.y = -10;
+            });
+            ctx.fill(); requestAnimationFrame(drawSnow);
         }
 
         window.onload = init;
