@@ -2,1027 +2,737 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🥚 Golden Egg Clicker - Telegram Web App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Golden Egg Clicker</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        :root {
+            --bg-color: #0a0b10;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --accent-color: #ffcc00;
+            --neon-blue: #00f2ff;
+            --neon-purple: #bc00ff;
+            --text-color: #ffffff;
+            --danger: #ff3b30;
+        }
+
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-            color: #e0e0e0;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .mirror-bg {
-            position: fixed;
-            inset: 0;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.1) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .gold-orb {
-            position: absolute;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.3), rgba(184, 134, 11, 0.1));
-            filter: blur(60px);
-            animation: float 20s infinite ease-in-out;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) translateX(0px); }
-            50% { transform: translateY(-50px) translateX(30px); }
-        }
-
-        .container {
-            position: relative;
-            z-index: 1;
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 20px;
-            min-height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+            height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        .glass {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-        }
-
-        .neon-cyan {
-            border-color: rgba(34, 211, 238, 0.5) !important;
-            box-shadow: 0 0 10px rgba(34, 211, 238, 0.3);
-        }
-
-        .neon-magenta {
-            border-color: rgba(236, 72, 153, 0.5) !important;
-            box-shadow: 0 0 10px rgba(236, 72, 153, 0.3);
-        }
-
-        .neon-pink {
-            border-color: rgba(236, 72, 153, 0.5) !important;
-            box-shadow: 0 0 10px rgba(236, 72, 153, 0.3);
-        }
-
+        /* Header with Profile */
         .header {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+        }
+
+        .user-profile {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
-            border: 2px solid;
-            border-radius: 12px;
         }
 
-        .avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: 2px solid;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            flex-shrink: 0;
+        .avatar-container {
+            position: relative;
+            width: 45px;
+            height: 45px;
         }
 
-        .avatar img {
+        .avatar-img {
             width: 100%;
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
+            border: 2px solid transparent;
         }
 
-        .user-info {
-            flex: 1;
+        .avatar-neon {
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--neon-blue), inset 0 0 5px var(--neon-blue);
+            pointer-events: none;
+            animation: neon-pulse 2s infinite alternate;
         }
 
-        .username {
-            font-weight: 600;
-            font-size: 16px;
+        @keyframes neon-pulse {
+            from { opacity: 0.5; box-shadow: 0 0 5px var(--neon-blue); }
+            to { opacity: 1; box-shadow: 0 0 15px var(--neon-blue); }
         }
 
-        .user-tag {
-            font-size: 12px;
-            opacity: 0.7;
-        }
-
-        .level-badge {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 8px 16px;
-            border-radius: 8px;
+        .user-info .name {
             font-weight: bold;
+            font-size: 14px;
+        }
+
+        .user-info .rank {
+            font-size: 11px;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Stats Display */
+        .stats-panel {
             text-align: center;
-            min-width: 60px;
+            padding: 20px 0;
         }
 
-        .level-label {
-            font-size: 10px;
-            opacity: 0.8;
+        .balance {
+            font-size: 42px;
+            font-weight: 900;
+            color: var(--accent-color);
+            text-shadow: 0 0 20px rgba(255, 204, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
-        .level-number {
-            font-size: 20px;
-            color: #00d4ff;
+        .income-stats {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 5px;
         }
 
-        .currencies {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .currency-box {
-            padding: 16px;
-            border: 2px solid;
-            border-radius: 12px;
+        /* The Golden Egg */
+        .game-container {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-        }
-
-        .currency-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            border: 2px solid;
-        }
-
-        .currency-label {
-            font-size: 12px;
-            opacity: 0.7;
-        }
-
-        .currency-amount {
-            font-size: 24px;
-            font-weight: bold;
-            color: #00d4ff;
-        }
-
-        .gold-gradient {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-        }
-
-        .coin-gradient {
-            background: linear-gradient(135deg, #FF1493 0%, #FF69B4 100%);
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
-            padding: 16px;
-            border: 2px solid;
-            border-radius: 12px;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            opacity: 0.7;
-            margin-bottom: 4px;
-        }
-
-        .stat-value {
-            font-size: 20px;
-            font-weight: bold;
-            color: #00d4ff;
-        }
-
-        .clicker-section {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 30px 0;
-        }
-
-        .egg-container {
             position: relative;
-            width: 200px;
-            height: 200px;
         }
 
-        .egg-circle {
-            position: absolute;
-            inset: 0;
-            border: 4px solid;
-            border-radius: 50%;
+        .egg-wrapper {
+            position: relative;
             cursor: pointer;
-            transition: transform 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            transition: transform 0.1s;
         }
 
-        .egg-circle:active {
+        .egg-wrapper:active {
             transform: scale(0.95);
         }
 
-        .egg-inner {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        .golden-egg {
+            width: 220px;
+            height: 280px;
+            background: radial-gradient(circle at 30% 30%, #fff9e6 0%, #ffcc00 40%, #b38f00 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            box-shadow: 
+                inset -10px -20px 30px rgba(0,0,0,0.3),
+                0 20px 50px rgba(255, 204, 0, 0.2);
             position: relative;
+            overflow: hidden;
         }
 
-        .egg-icon {
-            font-size: 80px;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-        }
-
-        .egg-multiplier {
+        .egg-shine {
             position: absolute;
-            bottom: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            color: white;
-            text-align: center;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            top: 10%;
+            left: 15%;
+            width: 40px;
+            height: 80px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 50%;
+            transform: rotate(20deg);
+            filter: blur(10px);
         }
 
+        /* Floating Text */
         .floating-text {
             position: absolute;
-            font-size: 20px;
+            color: var(--accent-color);
             font-weight: bold;
-            color: #FFD700;
+            font-size: 24px;
             pointer-events: none;
-            animation: float-up 1s ease-out forwards;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            animation: float-up 0.8s ease-out forwards;
+            z-index: 100;
         }
 
         @keyframes float-up {
-            0% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-60px) scale(0.8);
-            }
+            0% { transform: translateY(0) opacity(1); }
+            100% { transform: translateY(-100px) opacity(0); }
         }
 
+        /* Navigation */
         .nav-bar {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            padding: 12px;
-            border: 2px solid;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            background: rgba(255, 255, 255, 0.02);
+            display: flex;
+            background: rgba(15, 16, 25, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 10px 5px;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
         }
 
-        .nav-btn {
-            padding: 12px 8px;
-            border: 2px solid;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            color: #e0e0e0;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 600;
-            text-align: center;
-            transition: all 0.3s;
+        .nav-item {
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
+            color: rgba(255,255,255,0.5);
+            font-size: 10px;
+            position: relative;
+            cursor: pointer;
         }
 
-        .nav-btn:hover {
-            background: rgba(102, 126, 234, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .nav-btn:active {
-            transform: scale(0.95);
+        .nav-item.active {
+            color: var(--accent-color);
         }
 
         .nav-icon {
-            font-size: 18px;
+            font-size: 20px;
         }
 
-        .referral-btn {
-            grid-column: 1 / -1;
-            padding: 12px;
-            margin-top: 8px;
-        }
-
-        .modal {
+        .dot {
+            position: absolute;
+            top: -2px;
+            right: 25%;
+            width: 8px;
+            height: 8px;
+            background-color: var(--danger);
+            border-radius: 50%;
+            border: 2px solid var(--bg-color);
             display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            background: linear-gradient(to right, #fff, var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Upgrade Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s;
+        }
+
+        .card.locked {
+            filter: grayscale(1) opacity(0.5);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            display: flex;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border: 2px solid;
-            border-radius: 16px;
-            padding: 24px;
-            max-width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            animation: slideUp 0.3s ease-out;
-            position: relative;
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-header {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: none;
-            border: none;
-            color: #e0e0e0;
             font-size: 24px;
-            cursor: pointer;
         }
 
-        .item-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .item-card {
-            padding: 12px;
-            border: 2px solid;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .item-info {
+        .card-info {
             flex: 1;
         }
 
-        .item-name {
-            font-weight: 600;
+        .card-title {
+            font-weight: bold;
+            font-size: 16px;
             margin-bottom: 4px;
         }
 
-        .item-desc {
+        .card-desc {
             font-size: 12px;
-            opacity: 0.7;
+            color: rgba(255,255,255,0.5);
         }
 
-        .item-price {
+        .card-price {
             font-weight: bold;
-            color: #00d4ff;
-            min-width: 80px;
-            text-align: right;
+            color: var(--accent-color);
+            font-size: 14px;
         }
 
         .buy-btn {
-            padding: 8px 16px;
-            border: 2px solid;
-            border-radius: 6px;
-            background: rgba(102, 126, 234, 0.2);
-            color: #00d4ff;
+            background: var(--accent-color);
+            color: #000;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 12px;
             cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-            margin-left: 8px;
-        }
-
-        .buy-btn:hover {
-            background: rgba(102, 126, 234, 0.4);
         }
 
         .buy-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.3);
         }
 
-        .action-btn {
-            padding: 12px 24px;
-            border: 2px solid;
-            border-radius: 8px;
-            background: rgba(102, 126, 234, 0.2);
-            color: #00d4ff;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-            width: 100%;
-            margin-top: 12px;
-        }
-
-        .action-btn:hover {
-            background: rgba(102, 126, 234, 0.4);
-        }
-
+        /* Leaderboard */
         .leaderboard-item {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
             padding: 12px;
-            border: 2px solid;
-            border-radius: 8px;
-            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        .rank {
+        .rank-num {
+            width: 25px;
             font-weight: bold;
-            font-size: 18px;
-            min-width: 30px;
+            color: rgba(255,255,255,0.3);
         }
 
-        .rank-1 { color: #FFD700; }
-        .rank-2 { color: #C0C0C0; }
-        .rank-3 { color: #CD7F32; }
-
-        .medal {
-            font-size: 24px;
-            min-width: 30px;
-        }
-
-        .leaderboard-avatar {
-            width: 40px;
-            height: 40px;
+        .leader-avatar {
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
+            border: 1px solid var(--neon-blue);
         }
 
-        .leaderboard-info {
+        .leader-name {
             flex: 1;
+            font-size: 14px;
         }
 
-        .leaderboard-name {
-            font-weight: 600;
+        .leader-score {
+            font-weight: bold;
+            color: var(--accent-color);
         }
 
-        .leaderboard-eggs {
-            font-size: 12px;
-            opacity: 0.7;
+        /* Access Pass Section */
+        .pass-section {
+            background: linear-gradient(45deg, rgba(188, 0, 255, 0.1), rgba(0, 242, 255, 0.1));
+            border: 1px solid var(--neon-purple);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            text-align: center;
         }
 
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(102, 126, 234, 0.9);
-            color: white;
-            padding: 16px 24px;
-            border-radius: 8px;
-            border: 2px solid rgba(34, 211, 238, 0.5);
-            animation: slideIn 0.3s ease-out;
-            z-index: 2000;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 12px;
-            }
-
-            .egg-container {
-                width: 160px;
-                height: 160px;
-            }
-
-            .egg-icon {
-                font-size: 60px;
-            }
-
-            .modal-content {
-                max-width: 95%;
-            }
+        .pass-title {
+            color: var(--neon-purple);
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="mirror-bg">
-        <div class="gold-orb" style="width: 300px; height: 300px; left: -100px; top: 10%; animation-delay: 0s;"></div>
-        <div class="gold-orb" style="width: 250px; height: 250px; right: -50px; bottom: 20%; animation-delay: 5s;"></div>
-        <div class="gold-orb" style="width: 200px; height: 200px; left: 50%; top: 50%; animation-delay: 10s;"></div>
+    <div class="header">
+        <div class="user-profile">
+            <div class="avatar-container">
+                <img src="https://via.placeholder.com/100" id="user-avatar" class="avatar-img">
+                <div class="avatar-neon"></div>
+            </div>
+            <div class="user-info">
+                <div class="name" id="user-name">Загрузка...</div>
+                <div class="rank" id="user-rank">Новичок</div>
+            </div>
+        </div>
+        <div class="income-stats">
+            <div id="per-click">Клик: +1</div>
+            <div id="per-sec">Секунда: +0</div>
+        </div>
     </div>
 
-    <div class="container">
-        <div class="header glass neon-cyan">
-            <div class="avatar" id="avatar">👤</div>
-            <div class="user-info">
-                <div class="username" id="username">Player</div>
-                <div class="user-tag" id="usertag">@player</div>
-            </div>
-            <div class="level-badge">
-                <div class="level-label">Level</div>
-                <div class="level-number" id="level">1</div>
+    <div id="screen-game" class="screen active">
+        <div class="stats-panel">
+            <div class="balance">
+                <span id="balance-val">0</span>
+                <span style="font-size: 24px;">🥚</span>
             </div>
         </div>
-
-        <div class="currencies">
-            <div class="currency-box glass neon-magenta">
-                <div class="currency-icon gold-gradient neon-magenta">🥚</div>
-                <div class="currency-label">Eggs</div>
-                <div class="currency-amount" id="eggs">0</div>
-            </div>
-            <div class="currency-box glass neon-pink">
-                <div class="currency-icon coin-gradient neon-pink">💎</div>
-                <div class="currency-label">Coins</div>
-                <div class="currency-amount" id="coins">0</div>
-            </div>
-        </div>
-
-        <div class="stats glass neon-cyan">
-            <div class="stat-item">
-                <div class="stat-label">Total Clicks</div>
-                <div class="stat-value" id="totalClicks">0</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">Multiplier</div>
-                <div class="stat-value" id="multiplier">1.00x</div>
-            </div>
-        </div>
-
-        <div class="clicker-section">
-            <div class="egg-container">
-                <div class="egg-circle neon-magenta" id="eggClicker">
-                    <div class="egg-inner">
-                        <div class="egg-icon">🥚</div>
-                        <div class="egg-multiplier">
-                            <span id="eggMultiplier">1.00x</span><br>
-                            <span style="font-size: 10px;">per click</span>
-                        </div>
-                    </div>
+        <div class="game-container">
+            <div class="egg-wrapper" id="egg-btn">
+                <div class="golden-egg">
+                    <div class="egg-shine"></div>
                 </div>
             </div>
         </div>
-
-        <div class="nav-bar glass neon-cyan">
-            <button class="nav-btn neon-cyan" onclick="showModal('upgrades')">
-                <span class="nav-icon">⬆️</span>
-                <span>Upgrades</span>
-            </button>
-            <button class="nav-btn neon-magenta" onclick="showModal('achievements')">
-                <span class="nav-icon">🏆</span>
-                <span>Achievements</span>
-            </button>
-            <button class="nav-btn neon-pink" onclick="showModal('leaderboard')">
-                <span class="nav-icon">📊</span>
-                <span>Leaders</span>
-            </button>
-            <button class="nav-btn neon-cyan" onclick="showModal('boxes')">
-                <span class="nav-icon">📦</span>
-                <span>Boxes</span>
-            </button>
-            <button class="nav-btn neon-magenta" onclick="showModal('inventory')">
-                <span class="nav-icon">🎒</span>
-                <span>Inventory</span>
-            </button>
-            <button class="nav-btn neon-pink referral-btn" onclick="showModal('referral')">
-                <span class="nav-icon">👥</span>
-                <span>Referral Program</span>
-            </button>
-        </div>
     </div>
 
-    <div class="modal" id="upgradesModal">
-        <div class="modal-content neon-cyan">
-            <button class="close-btn" onclick="closeModal('upgrades')">✕</button>
-            <div class="modal-header">⬆️ Upgrades</div>
-            <div class="item-list" id="upgradesList"></div>
-        </div>
+    <div id="screen-upgrades" class="screen">
+        <h2>Улучшения</h2>
+        <div id="pass-container"></div>
+        <div id="upgrades-list"></div>
     </div>
 
-    <div class="modal" id="achievementsModal">
-        <div class="modal-content neon-magenta">
-            <button class="close-btn" onclick="closeModal('achievements')">✕</button>
-            <div class="modal-header">🏆 Achievements</div>
-            <div class="item-list" id="achievementsList"></div>
-        </div>
+    <div id="screen-achievements" class="screen">
+        <h2>Достижения</h2>
+        <div id="achievements-list"></div>
     </div>
 
-    <div class="modal" id="leaderboardModal">
-        <div class="modal-content neon-pink">
-            <button class="close-btn" onclick="closeModal('leaderboard')">✕</button>
-            <div class="modal-header">📊 Leaderboard</div>
-            <div id="leaderboardList"></div>
-        </div>
+    <div id="screen-top" class="screen">
+        <h2>Мировой Топ</h2>
+        <div id="leaderboard-list"></div>
     </div>
 
-    <div class="modal" id="boxesModal">
-        <div class="modal-content neon-cyan">
-            <button class="close-btn" onclick="closeModal('boxes')">✕</button>
-            <div class="modal-header">📦 Loot Boxes</div>
-            <div class="item-list" id="boxesList"></div>
+    <nav class="nav-bar">
+        <div class="nav-item active" onclick="showScreen('game')">
+            <div class="nav-icon">🎮</div>
+            <span>Игра</span>
         </div>
-    </div>
-
-    <div class="modal" id="inventoryModal">
-        <div class="modal-content neon-magenta">
-            <button class="close-btn" onclick="closeModal('inventory')">✕</button>
-            <div class="modal-header">🎒 Inventory</div>
-            <div class="item-list" id="inventoryList"></div>
+        <div class="nav-item" onclick="showScreen('upgrades')">
+            <div class="nav-icon">⚡</div>
+            <span>Апгрейды</span>
+            <div id="dot-upgrades" class="dot"></div>
         </div>
-    </div>
-
-    <div class="modal" id="referralModal">
-        <div class="modal-content neon-pink">
-            <button class="close-btn" onclick="closeModal('referral')">✕</button>
-            <div class="modal-header">👥 Referral Program</div>
-            <div id="referralContent"></div>
+        <div class="nav-item" onclick="showScreen('achievements')">
+            <div class="nav-icon">🏆</div>
+            <span>Ачивки</span>
+            <div id="dot-achievements" class="dot"></div>
         </div>
-    </div>
+        <div class="nav-item" onclick="showScreen('top')">
+            <div class="nav-icon">📊</div>
+            <span>Топ</span>
+        </div>
+    </nav>
 
     <script>
-        const tg = window.Telegram?.WebApp;
-        if (tg) {
-            tg.ready();
-            tg.expand();
-        }
+        const tg = window.Telegram.WebApp;
+        tg.expand();
 
-        let gameData = {
-            userId: Math.random().toString(36).substr(2, 9),
-            username: tg?.initDataUnsafe?.user?.username || 'Player',
-            firstName: tg?.initDataUnsafe?.user?.first_name || 'User',
-            photoUrl: tg?.initDataUnsafe?.user?.photo_url || null,
-            eggs: 0,
+        // Game State
+        let state = {
             coins: 0,
+            totalEarned: 0,
             totalClicks: 0,
-            level: 1,
-            experience: 0,
-            clickMultiplier: 1,
-            upgrades: [],
+            clickPower: 1,
+            autoPower: 0,
+            currentTier: 1,
+            upgrades: {},
             achievements: [],
-            inventory: [],
-            referralCode: 'REF-' + Math.random().toString(36).substr(2, 8).toUpperCase(),
-            referrals: 0
+            passes: [],
+            lastUpdate: Date.now(),
+            newAchievements: false
         };
 
-        function loadGame() {
-            const saved = localStorage.getItem('eggClickerGame');
-            if (saved) {
-                gameData = { ...gameData, ...JSON.parse(saved) };
-            }
-            updateUI();
+        // Configuration
+        const TIERS = {
+            1: { name: "Бронзовый век", nextPassPrice: 5000 },
+            2: { name: "Серебряный век", nextPassPrice: 50000 },
+            3: { name: "Золотой век", nextPassPrice: 500000 },
+            4: { name: "Платиновый век", nextPassPrice: 5000000 },
+            5: { name: "Алмазный век", nextPassPrice: 0 }
+        };
+
+        const UPGRADES = [
+            { id: 'u1', name: 'Куриная лапка', desc: '+1 к клику', basePrice: 15, power: 1, type: 'click', tier: 1 },
+            { id: 'u2', name: 'Гнездо', desc: '+1 в сек', basePrice: 50, power: 1, type: 'auto', tier: 1 },
+            { id: 'u3', name: 'Зерно премиум', desc: '+5 к клику', basePrice: 200, power: 5, type: 'click', tier: 1 },
+            { id: 'u4', name: 'Инкубатор', desc: '+8 в сек', basePrice: 500, power: 8, type: 'auto', tier: 1 },
+            
+            { id: 'u5', name: 'Серебряный молот', desc: '+25 к клику', basePrice: 2000, power: 25, type: 'click', tier: 2 },
+            { id: 'u6', name: 'Ферма 2.0', desc: '+40 в сек', basePrice: 4500, power: 40, type: 'auto', tier: 2 },
+            
+            { id: 'u7', name: 'Золотой клюв', desc: '+150 к клику', basePrice: 15000, power: 150, type: 'click', tier: 3 },
+            { id: 'u8', name: 'Завод яиц', desc: '+250 в сек', basePrice: 35000, power: 250, type: 'auto', tier: 3 }
+        ];
+
+        // Add more upgrades dynamically to reach ~50
+        for(let i=9; i<=50; i++) {
+            const tier = Math.floor(i/10) + 1;
+            UPGRADES.push({
+                id: `u${i}`,
+                name: `Апгрейд #${i}`,
+                desc: i % 2 === 0 ? `+${i*10} в сек` : `+${i*5} к клику`,
+                basePrice: Math.floor(100 * Math.pow(2.5, i/2)),
+                power: i % 2 === 0 ? i*10 : i*5,
+                type: i % 2 === 0 ? 'auto' : 'click',
+                tier: tier
+            });
         }
 
-        function saveGame() {
-            localStorage.setItem('eggClickerGame', JSON.stringify(gameData));
+        const ACHIEVEMENTS = [];
+        for(let i=1; i<=100; i++) {
+            ACHIEVEMENTS.push({
+                id: `a${i}`,
+                name: `Достижение ${i}`,
+                desc: `Цель: ${i * 1000} монет`,
+                requirement: i * 1000,
+                type: 'earned'
+            });
+        }
+
+        // Initialization
+        function init() {
+            const user = tg.initDataUnsafe?.user || { first_name: "Игрок", id: 0, photo_url: "" };
+            document.getElementById('user-name').innerText = user.first_name;
+            if(user.photo_url) document.getElementById('user-avatar').src = user.photo_url;
+
+            loadGame();
+            updateUI();
+            
+            setInterval(gameLoop, 1000);
+            setInterval(saveGame, 5000);
+            setInterval(syncLeaderboard, 10000);
+        }
+
+        function gameLoop() {
+            if (state.autoPower > 0) {
+                addCoins(state.autoPower);
+            }
+            checkNotifications();
+        }
+
+        function addCoins(amount) {
+            state.coins += amount;
+            state.totalEarned += amount;
+            updateUI();
+            checkAchievements();
+        }
+
+        function checkAchievements() {
+            ACHIEVEMENTS.forEach(ach => {
+                if (!state.achievements.includes(ach.id) && state.totalEarned >= ach.requirement) {
+                    state.achievements.push(ach.id);
+                    state.newAchievements = true;
+                    tg.HapticFeedback.notificationOccurred('success');
+                }
+            });
+        }
+
+        function checkNotifications() {
+            // Check upgrades
+            let canBuyAny = false;
+            UPGRADES.forEach(u => {
+                if (u.tier <= state.currentTier) {
+                    const price = getPrice(u);
+                    if (state.coins >= price) canBuyAny = true;
+                }
+            });
+            
+            // Check pass
+            const nextTier = state.currentTier + 1;
+            if (TIERS[state.currentTier].nextPassPrice > 0 && state.coins >= TIERS[state.currentTier].nextPassPrice) {
+                canBuyAny = true;
+            }
+
+            document.getElementById('dot-upgrades').style.display = canBuyAny ? 'block' : 'none';
+            document.getElementById('dot-achievements').style.display = state.newAchievements ? 'block' : 'none';
+        }
+
+        function getPrice(upgrade) {
+            const count = state.upgrades[upgrade.id] || 0;
+            return Math.floor(upgrade.basePrice * Math.pow(1.25, count));
+        }
+
+        function buyUpgrade(id) {
+            const u = UPGRADES.find(x => x.id === id);
+            const price = getPrice(u);
+            if (state.coins >= price) {
+                state.coins -= price;
+                state.upgrades[id] = (state.upgrades[id] || 0) + 1;
+                recalculateStats();
+                updateUI();
+                tg.HapticFeedback.impactOccurred('medium');
+            }
+        }
+
+        function buyPass() {
+            const price = TIERS[state.currentTier].nextPassPrice;
+            if (state.coins >= price) {
+                state.coins -= price;
+                state.currentTier++;
+                updateUI();
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+        }
+
+        function recalculateStats() {
+            let cp = 1;
+            let ap = 0;
+            UPGRADES.forEach(u => {
+                const count = state.upgrades[u.id] || 0;
+                if (u.type === 'click') cp += u.power * count;
+                else ap += u.power * count;
+            });
+            state.clickPower = cp;
+            state.autoPower = ap;
         }
 
         function updateUI() {
-            document.getElementById('username').textContent = gameData.firstName;
-            document.getElementById('usertag').textContent = '@' + gameData.username;
-            document.getElementById('level').textContent = gameData.level;
-            document.getElementById('eggs').textContent = formatNumber(gameData.eggs);
-            document.getElementById('coins').textContent = formatNumber(gameData.coins);
-            document.getElementById('totalClicks').textContent = formatNumber(gameData.totalClicks);
-            document.getElementById('multiplier').textContent = gameData.clickMultiplier.toFixed(2) + 'x';
-            document.getElementById('eggMultiplier').textContent = gameData.clickMultiplier.toFixed(2) + 'x';
+            document.getElementById('balance-val').innerText = Math.floor(state.coins).toLocaleString();
+            document.getElementById('per-click').innerText = `Клик: +${state.clickPower}`;
+            document.getElementById('per-sec').innerText = `Секунда: +${state.autoPower}`;
+            document.getElementById('user-rank').innerText = TIERS[state.currentTier].name;
+
+            if (document.getElementById('screen-upgrades').classList.contains('active')) {
+                renderUpgrades();
+            }
+            if (document.getElementById('screen-achievements').classList.contains('active')) {
+                renderAchievements();
+            }
+            if (document.getElementById('screen-top').classList.contains('active')) {
+                renderLeaderboard();
+            }
         }
 
-        function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-        }
-
-        document.getElementById('eggClicker').addEventListener('click', function(e) {
-            const clickValue = Math.floor(gameData.clickMultiplier);
-            gameData.eggs += clickValue;
-            gameData.totalClicks += 1;
-
-            if (gameData.totalClicks % 100 === 0) {
-                gameData.level += 1;
-                showNotification(`🎊 Level Up! You are now level ${gameData.level}!`);
-                playSound('levelup');
+        function renderUpgrades() {
+            const list = document.getElementById('upgrades-list');
+            const passCont = document.getElementById('pass-container');
+            
+            // Render Pass
+            const nextTier = state.currentTier + 1;
+            if (TIERS[state.currentTier].nextPassPrice > 0) {
+                const price = TIERS[state.currentTier].nextPassPrice;
+                passCont.innerHTML = `
+                    <div class="pass-section">
+                        <div class="pass-title">Доступ к ${TIERS[nextTier].name}</div>
+                        <p style="font-size: 12px; margin-bottom: 10px; opacity: 0.7;">Разблокируйте новые мощные апгрейды</p>
+                        <button class="buy-btn" onclick="buyPass()" ${state.coins < price ? 'disabled' : ''}>
+                            Купить за ${price.toLocaleString()} 🥚
+                        </button>
+                    </div>
+                `;
+            } else {
+                passCont.innerHTML = '';
             }
 
-            const rect = this.getBoundingClientRect();
-            const floatingText = document.createElement('div');
-            floatingText.className = 'floating-text';
-            floatingText.textContent = '+' + formatNumber(clickValue);
-            floatingText.style.left = (e.clientX - rect.left) + 'px';
-            floatingText.style.top = (e.clientY - rect.top) + 'px';
-            this.appendChild(floatingText);
-            setTimeout(() => floatingText.remove(), 1000);
+            list.innerHTML = UPGRADES.map(u => {
+                const count = state.upgrades[u.id] || 0;
+                const price = getPrice(u);
+                const isLocked = u.tier > state.currentTier;
+                
+                return `
+                    <div class="card ${isLocked ? 'locked' : ''}">
+                        <div class="card-icon">${u.type === 'click' ? '👆' : '⚙️'}</div>
+                        <div class="card-info">
+                            <div class="card-title">${u.name} [${count}]</div>
+                            <div class="card-desc">${u.desc}</div>
+                            <div class="card-price">${price.toLocaleString()} 🥚</div>
+                        </div>
+                        ${!isLocked ? `<button class="buy-btn" onclick="buyUpgrade('${u.id}')" ${state.coins < price ? 'disabled' : ''}>Купить</button>` : '🔒'}
+                    </div>
+                `;
+            }).join('');
+        }
 
-            playSound('click');
+        function renderAchievements() {
+            const list = document.getElementById('achievements-list');
+            list.innerHTML = ACHIEVEMENTS.map(ach => {
+                const isDone = state.achievements.includes(ach.id);
+                return `
+                    <div class="card" style="opacity: ${isDone ? 1 : 0.4}">
+                        <div class="card-icon">${isDone ? '✅' : '🔒'}</div>
+                        <div class="card-info">
+                            <div class="card-title">${ach.name}</div>
+                            <div class="card-desc">${ach.desc}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            state.newAchievements = false;
+        }
+
+        function renderLeaderboard() {
+            const list = document.getElementById('leaderboard-list');
+            const mockTop = [
+                { name: "Павел Дуров", score: 999999999, avatar: "https://via.placeholder.com/100" },
+                { name: "Крипто Магнат", score: 50000000, avatar: "https://via.placeholder.com/100" },
+                { name: "Яичный Король", score: 10000000, avatar: "https://via.placeholder.com/100" },
+                { name: "Manus AI", score: 5000000, avatar: "https://via.placeholder.com/100" }
+            ];
+            
+            // Add current user
+            const user = tg.initDataUnsafe?.user || { first_name: "Вы" };
+            mockTop.push({ name: user.first_name + " (Вы)", score: state.totalEarned, avatar: user.photo_url || "https://via.placeholder.com/100" });
+            
+            mockTop.sort((a,b) => b.score - a.score);
+
+            list.innerHTML = mockTop.map((item, index) => `
+                <div class="leaderboard-item">
+                    <div class="rank-num">#${index + 1}</div>
+                    <img src="${item.avatar}" class="leader-avatar">
+                    <div class="leader-name">${item.name}</div>
+                    <div class="leader-score">${Math.floor(item.score).toLocaleString()}</div>
+                </div>
+            `).join('');
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById(`screen-${id}`).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
             updateUI();
-            saveGame();
+        }
+
+        // Click Handler
+        document.getElementById('egg-btn').addEventListener('click', (e) => {
+            addCoins(state.clickPower);
+            state.totalClicks++;
+            
+            // Floating text
+            const text = document.createElement('div');
+            text.className = 'floating-text';
+            text.innerText = `+${state.clickPower}`;
+            text.style.left = `${e.clientX}px`;
+            text.style.top = `${e.clientY}px`;
+            document.body.appendChild(text);
+            setTimeout(() => text.remove(), 800);
+            
+            tg.HapticFeedback.impactOccurred('light');
         });
 
-        function playSound(type) {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
+        // Storage
+        function saveGame() {
+            localStorage.setItem('golden_egg_save', JSON.stringify(state));
+        }
 
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-
-            if (type === 'click') {
-                oscillator.frequency.value = 800;
-                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.1);
-            } else if (type === 'levelup') {
-                oscillator.frequency.value = 1200;
-                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.3);
+        function loadGame() {
+            const saved = localStorage.getItem('golden_egg_save');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                state = { ...state, ...parsed };
+                recalculateStats();
             }
         }
 
-        function showModal(type) {
-            const modalMap = {
-                'upgrades': 'upgradesModal',
-                'achievements': 'achievementsModal',
-                'leaderboard': 'leaderboardModal',
-                'boxes': 'boxesModal',
-                'inventory': 'inventoryModal',
-                'referral': 'referralModal'
-            };
-
-            const modalId = modalMap[type];
-            const modal = document.getElementById(modalId);
-            modal.classList.add('active');
-
-            if (type === 'upgrades') loadUpgrades();
-            else if (type === 'achievements') loadAchievements();
-            else if (type === 'leaderboard') loadLeaderboard();
-            else if (type === 'boxes') loadBoxes();
-            else if (type === 'inventory') loadInventory();
-            else if (type === 'referral') loadReferral();
+        function syncLeaderboard() {
+            // In a real app, you would send state.totalEarned to your server here
+            console.log("Syncing with Telegram servers...");
         }
 
-        function closeModal(type) {
-            const modalMap = {
-                'upgrades': 'upgradesModal',
-                'achievements': 'achievementsModal',
-                'leaderboard': 'leaderboardModal',
-                'boxes': 'boxesModal',
-                'inventory': 'inventoryModal',
-                'referral': 'referralModal'
-            };
-            document.getElementById(modalMap[type]).classList.remove('active');
-        }
-
-        function loadUpgrades() {
-            const upgrades = [
-                { name: 'Click Boost +1', desc: '+0.1 multiplier', price: 100, type: 'multiplier' },
-                { name: 'Click Boost +2', desc: '+0.5 multiplier', price: 500, type: 'multiplier' },
-                { name: 'Click Boost +3', desc: '+1.0 multiplier', price: 2000, type: 'multiplier' },
-                { name: 'Egg Collector', desc: '+10% eggs', price: 1000, type: 'collector' },
-                { name: 'Coin Generator', desc: '+5 coins per click', price: 5000, type: 'coins' }
-            ];
-
-            const list = document.getElementById('upgradesList');
-            list.innerHTML = upgrades.map((upgrade, idx) => `
-                <div class="item-card glass neon-cyan">
-                    <div class="item-info">
-                        <div class="item-name">${upgrade.name}</div>
-                        <div class="item-desc">${upgrade.desc}</div>
-                    </div>
-                    <div class="item-price">${formatNumber(upgrade.price)} 💎</div>
-                    <button class="buy-btn neon-cyan" onclick="buyUpgrade(${idx}, ${upgrade.price})">Buy</button>
-                </div>
-            `).join('');
-        }
-
-        function buyUpgrade(idx, price) {
-            if (gameData.coins >= price) {
-                gameData.coins -= price;
-                gameData.clickMultiplier += 0.1;
-                gameData.upgrades.push(idx);
-                showNotification('✅ Upgrade purchased!');
-                updateUI();
-                saveGame();
-                loadUpgrades();
-            } else {
-                showNotification('❌ Not enough coins!');
-            }
-        }
-
-        function loadAchievements() {
-            const achievements = [
-                { name: 'First Click', desc: 'Make your first click', icon: '👆' },
-                { name: '100 Clicks', desc: 'Reach 100 total clicks', icon: '💯' },
-                { name: 'Rich', desc: 'Earn 10,000 coins', icon: '💰' },
-                { name: 'Collector', desc: 'Collect 1,000 eggs', icon: '🥚' },
-                { name: 'Level 5', desc: 'Reach level 5', icon: '⭐' }
-            ];
-
-            const list = document.getElementById('achievementsList');
-            list.innerHTML = achievements.map(ach => `
-                <div class="item-card glass neon-magenta">
-                    <div class="item-info">
-                        <div class="item-name">${ach.icon} ${ach.name}</div>
-                        <div class="item-desc">${ach.desc}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function loadLeaderboard() {
-            const leaderboard = [
-                { rank: 1, name: 'Pro Player', eggs: 50000, medal: '🥇' },
-                { rank: 2, name: 'Egg Master', eggs: 35000, medal: '🥈' },
-                { rank: 3, name: 'Click King', eggs: 25000, medal: '🥉' },
-                { rank: 4, name: gameData.firstName, eggs: gameData.eggs, medal: '' },
-                { rank: 5, name: 'Beginner', eggs: 5000, medal: '' }
-            ];
-
-            const list = document.getElementById('leaderboardList');
-            list.innerHTML = leaderboard.map(item => `
-                <div class="leaderboard-item glass neon-pink">
-                    <div class="rank rank-${item.rank}">${item.rank}</div>
-                    <div class="medal">${item.medal}</div>
-                    <div class="leaderboard-avatar">👤</div>
-                    <div class="leaderboard-info">
-                        <div class="leaderboard-name">${item.name}</div>
-                        <div class="leaderboard-eggs">${formatNumber(item.eggs)} 🥚</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function loadBoxes() {
-            const boxes = [
-                { name: 'Normal Box', price: 1000, color: 'neon-cyan', reward: 'coins' },
-                { name: 'Silver Box', price: 5000, color: 'neon-magenta', reward: 'multiplier' },
-                { name: 'Gold Box', price: 25000, color: 'neon-pink', reward: 'eggs' },
-                { name: 'Diamond Box', price: 450000, color: 'neon-cyan', reward: 'legendary' }
-            ];
-
-            const list = document.getElementById('boxesList');
-            list.innerHTML = boxes.map((box, idx) => `
-                <div class="item-card glass ${box.color}">
-                    <div class="item-info">
-                        <div class="item-name">${box.name}</div>
-                        <div class="item-desc">Reward: ${box.reward}</div>
-                    </div>
-                    <div class="item-price">${formatNumber(box.price)} 💎</div>
-                    <button class="buy-btn ${box.color}" onclick="buyBox(${idx}, ${box.price})">Open</button>
-                </div>
-            `).join('');
-        }
-
-        function buyBox(idx, price) {
-            if (gameData.coins >= price) {
-                gameData.coins -= price;
-                gameData.inventory.push({ type: 'buff', name: 'Box Reward', duration: 3600 });
-                showNotification('🎉 Box opened! Check inventory!');
-                updateUI();
-                saveGame();
-                loadBoxes();
-            } else {
-                showNotification('❌ Not enough coins!');
-            }
-        }
-
-        function loadInventory() {
-            const list = document.getElementById('inventoryList');
-            if (gameData.inventory.length === 0) {
-                list.innerHTML = '<div class="item-card glass neon-magenta">Empty inventory</div>';
-            } else {
-                list.innerHTML = gameData.inventory.map((item, idx) => `
-                    <div class="item-card glass neon-magenta">
-                        <div class="item-info">
-                            <div class="item-name">${item.name}</div>
-                            <div class="item-desc">Duration: ${item.duration}s</div>
-                        </div>
-                        <button class="buy-btn neon-magenta" onclick="activateBuff(${idx})">Activate</button>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function activateBuff(idx) {
-            gameData.clickMultiplier *= 2;
-            gameData.inventory.splice(idx, 1);
-            showNotification('⚡ Buff activated! 2x multiplier!');
-            updateUI();
-            saveGame();
-            loadInventory();
-        }
-
-        function loadReferral() {
-            const content = document.getElementById('referralContent');
-            content.innerHTML = `
-                <div style="padding: 16px;">
-                    <div class="item-card glass neon-pink" style="margin-bottom: 16px;">
-                        <div class="item-info">
-                            <div class="item-name">Your Referral Code</div>
-                            <div class="item-desc" style="font-size: 14px; margin-top: 8px; word-break: break-all;">${gameData.referralCode}</div>
-                        </div>
-                        <button class="buy-btn neon-pink" onclick="copyReferralCode()">Copy</button>
-                    </div>
-
-                    <div class="item-card glass neon-pink" style="margin-bottom: 16px;">
-                        <div class="item-info">
-                            <div class="item-name">Referral Stats</div>
-                            <div class="item-desc">Total Referrals: ${gameData.referrals}</div>
-                            <div class="item-desc">Reward: ${formatNumber(gameData.referrals * 5000)} 💎</div>
-                        </div>
-                    </div>
-
-                    <div class="item-card glass neon-pink">
-                        <div class="item-info">
-                            <div class="item-name">💡 How it works</div>
-                            <div class="item-desc">Share your code with friends. When they join using your code, you both get rewards!</div>
-                            <div class="item-desc" style="margin-top: 8px;">You: +5000 coins | Friend: +2500 coins</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function copyReferralCode() {
-            navigator.clipboard.writeText(gameData.referralCode).then(() => {
-                showNotification('✅ Code copied!');
-            });
-        }
-
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 3000);
-        }
-
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.classList.remove('active');
-                }
-            });
-        });
-
-        loadGame();
+        window.onload = init;
     </script>
 </body>
 </html>
